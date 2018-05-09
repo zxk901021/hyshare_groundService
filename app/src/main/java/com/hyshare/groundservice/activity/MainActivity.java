@@ -62,6 +62,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements A
         mLayoutBinding.manageCar.setOnClickListener(this);
         mLayoutBinding.myWorkList.setOnClickListener(this);
         ImmersionBar.with(this).statusBarView(R.id.top_view).statusBarDarkFont(false).init();
+        mLayoutBinding.setting.setOnClickListener(this);
     }
 
     private void getPermission(){
@@ -180,6 +181,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> implements A
             case R.id.my_work_list:
                 Intent intent1 = new Intent(context, WorkListActivity.class);
                 startActivity(intent1);
+                break;
+            case R.id.setting:
+                Intent intent2 = new Intent(context, SettingActivity.class);
+                startActivity(intent2);
                 break;
         }
     }

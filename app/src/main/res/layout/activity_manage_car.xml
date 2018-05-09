@@ -46,8 +46,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone">
+            android:layout_height="wrap_content">
 
             <ImageView
                 android:id="@+id/car_photo"
@@ -159,8 +158,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="12dp"
-            android:visibility="gone">
+            android:padding="12dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -284,8 +282,10 @@
                 android:layout_marginBottom="20dp"
                 android:layout_marginLeft="12dp"
                 android:layout_marginRight="12dp"
+                android:background="#f85f4a"
                 android:text="结束工单"
-                android:textColor="#ffffff" />
+                android:textColor="#ffffff"
+                android:visibility="gone"/>
 
             <ImageView
                 android:id="@+id/guide"

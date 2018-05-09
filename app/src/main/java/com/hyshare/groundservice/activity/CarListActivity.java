@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -20,9 +21,12 @@ import com.chad.library.adapter.base.BaseViewHolder;
 import com.hyshare.groundservice.R;
 import com.hyshare.groundservice.base.BaseActivity;
 import com.hyshare.groundservice.databinding.ActivityCarListBinding;
+import com.hyshare.groundservice.map.AmapUtil;
 import com.hyshare.groundservice.model.BaseModel;
 import com.hyshare.groundservice.model.CarList;
+import com.hyshare.groundservice.model.MapPoint;
 import com.hyshare.groundservice.model.ViewModel;
+import com.hyshare.groundservice.util.SharedUtil;
 import com.hyshare.groundservice.util.ToastUtil;
 import com.hyshare.groundservice.view.GasPercentView;
 
@@ -40,6 +44,7 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> {
 
     BaseQuickAdapter adapter;
     private int responseCode = 0;
+    MapPoint start;
 
     @Override
     public int setLayoutId() {
@@ -48,14 +53,18 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> {
 
     @Override
     public void initUI() {
+        String lat = SharedUtil.getString(context, "lat");
+        String lon = SharedUtil.getString(context, "lon");
+        start = new MapPoint(Double.valueOf(lat), Double.valueOf(lon));
         adapter = new BaseQuickAdapter<CarList.CarListBean, BaseViewHolder>(R.layout.item_car_list_layout) {
             @Override
             protected void convert(BaseViewHolder helper, CarList.CarListBean item) {
                 helper.setText(R.id.car_number, item.getNumber());
                 helper.setText(R.id.car_type, item.getBrand_name() + item.getSeat_num() + "座");
-//                GasPercentView gasPercentView = helper.itemView.findViewById(R.id.gas);
                 ((GasPercentView)helper.itemView.findViewById(R.id.gas)).init(item.getRemaining_gas());
                 helper.setText(R.id.car_status, setUseState(item.getUse_state()));
+                MapPoint end = new MapPoint(Double.valueOf(item.getLatitude()), Double.valueOf(item.getLongitude()));
+                helper.setText(R.id.distance, "距离：" + AmapUtil.format(AmapUtil.calculateLineDistance(start, end)/1000) + "公里");
                 ViewModel model = setOperation(item.getClaim_state());
                 helper.setText(R.id.operate_car, model.getText());
                 helper.setBackgroundRes(R.id.operate_car, model.getRes());
@@ -83,20 +92,13 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 if (i == EditorInfo.IME_ACTION_SEND || (keyEvent != null && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)){
-
+                    String number = mLayoutBinding.searchInfo.getText().toString().trim();
+                    getCarList(number);
                     return true;
                 }
                 return false;
             }
         });
-    }
-
-    private void search(){
-
-    }
-
-    private void setClickListener(String mode){
-
     }
 
     private String setUseState(String status){
@@ -124,8 +126,10 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> {
                 model.setRes(R.drawable.already_button_bg);
                 return model;
             case "3":
-                model.setText("取消认领");
-                model.setRes(R.drawable.cancel_button_bg);
+                model.setText("已被认领");
+                model.setRes(R.drawable.already_button_bg);
+//                model.setText("取消认领");
+//                model.setRes(R.drawable.cancel_button_bg);
                 return model;
         }
         return model;
@@ -133,13 +137,19 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> {
 
     @Override
     public void initData() {
-        Map<String, Object> param = new HashMap<>();
-        getCarList(param);
+
     }
 
-    private void getCarList(Map<String, Object> param){
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String number = "";
+        getCarList(number);
+    }
+
+    private void getCarList(String number){
         showDialog();
-        getApiService().getCarList(param)
+        getApiService().getCarList(number)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<BaseModel<CarList>>() {

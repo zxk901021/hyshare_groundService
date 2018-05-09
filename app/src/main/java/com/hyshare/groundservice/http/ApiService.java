@@ -34,8 +34,8 @@ public interface ApiService {
     @GET("v1/groundservice/WordOrders/?")
     Observable<BaseModel<WorkList>> getWorkList(@Query("create_time") String time);
 
-    @GET("v1/groundservice/GroundCars/")
-    Observable<BaseModel<CarList>> getCarList(@QueryMap Map<String, Object> param);
+    @GET("v1/groundservice/GroundCars/?")
+    Observable<BaseModel<CarList>> getCarList(@Query("number") String number);
 
     @GET("v1/groundservice/GroundCars/{id}")
     Observable<BaseModel<CarList.CarListBean>> getCarInfo(@Path("id") String id);

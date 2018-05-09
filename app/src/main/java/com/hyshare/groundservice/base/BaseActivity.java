@@ -22,6 +22,7 @@ import com.hyshare.groundservice.util.SharedUtil;
 import com.kaopiz.kprogresshud.KProgressHUD;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -101,7 +102,11 @@ public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatA
                 }
             });
         }
-        OkHttpClient client = builder.build();
+        OkHttpClient client = builder
+                .connectTimeout(20, TimeUnit.SECONDS)
+                .readTimeout(20, TimeUnit.SECONDS)
+                .writeTimeout(20, TimeUnit.SECONDS)
+                .build();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(RequestUrl.BASE_URL)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())

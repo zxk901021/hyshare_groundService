@@ -1,6 +1,7 @@
 package com.hyshare.groundservice.activity;
 
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -62,6 +63,14 @@ public class WorkListActivity extends BaseActivity<ActivityWorkListBinding> {
                 }
             }
         };
+        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                Intent intent = new Intent(context, ManageCarActivity.class);
+                intent.putExtra("id", ((WorkList.WorkListBean)adapter.getItem(position)).getCar_id());
+                startActivity(intent);
+            }
+        });
         mLayoutBinding.workList.setLayoutManager(new LinearLayoutManager(context));
         mLayoutBinding.workList.setAdapter(adapter);
         mLayoutBinding.time.setOnClickListener(new View.OnClickListener() {

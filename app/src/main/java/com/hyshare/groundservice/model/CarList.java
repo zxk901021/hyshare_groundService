@@ -59,6 +59,10 @@ public class CarList {
         private String last_refuel;
         private String last_maintain;
         private String last_clean_time;
+        private String word_order_start_time;
+        private String word_order_state;
+        private String word_order_task;
+        private String word_order_id;
 
         public String getId() {
             return id;
@@ -306,6 +310,38 @@ public class CarList {
 
         public void setLast_clean_time(String last_clean_time) {
             this.last_clean_time = last_clean_time;
+        }
+
+        public String getWord_order_start_time() {
+            return word_order_start_time;
+        }
+
+        public void setWord_order_start_time(String word_order_start_time) {
+            this.word_order_start_time = word_order_start_time;
+        }
+
+        public String getWord_order_state() {
+            return word_order_state;
+        }
+
+        public void setWord_order_state(String word_order_state) {
+            this.word_order_state = word_order_state;
+        }
+
+        public String getWord_order_task() {
+            return word_order_task;
+        }
+
+        public void setWord_order_task(String word_order_task) {
+            this.word_order_task = word_order_task;
+        }
+
+        public String getWord_order_id() {
+            return word_order_id;
+        }
+
+        public void setWord_order_id(String word_order_id) {
+            this.word_order_id = word_order_id;
         }
     }
 }

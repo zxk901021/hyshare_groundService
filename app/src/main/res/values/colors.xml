@@ -7,4 +7,5 @@
     <color name="orangeRed">#F85F4A</color>
     <color name="grey">#CCCCCC</color>
     <color name="pinkBlue">#33E1EF</color>
+    <drawable name="drawableTrans">@android:color/transparent</drawable>
 </resources>
