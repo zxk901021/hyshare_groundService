@@ -23,6 +23,7 @@ import com.hyshare.groundservice.model.WorkList;
 import com.hyshare.groundservice.util.ToastUtil;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -58,6 +59,10 @@ public class WorkListActivity extends BaseActivity<ActivityWorkListBinding> {
                 if (!TextUtils.isEmpty(task)) {
                     if (task.contains(",")) {
                         List<String> tasks = Arrays.asList(task.split(","));
+                        ((LabelsView) helper.getView(R.id.work_task)).setLabels(tasks);
+                    }else {
+                        List<String> tasks = new ArrayList<>();
+                        tasks.add(task);
                         ((LabelsView) helper.getView(R.id.work_task)).setLabels(tasks);
                     }
                 }

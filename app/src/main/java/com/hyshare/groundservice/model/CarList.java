@@ -63,6 +63,7 @@ public class CarList {
         private String word_order_state;
         private String word_order_task;
         private String word_order_id;
+        private float distance;
 
         public String getId() {
             return id;
@@ -342,6 +343,14 @@ public class CarList {
 
         public void setWord_order_id(String word_order_id) {
             this.word_order_id = word_order_id;
+        }
+
+        public float getDistance() {
+            return distance;
+        }
+
+        public void setDistance(float distance) {
+            this.distance = distance;
         }
     }
 }

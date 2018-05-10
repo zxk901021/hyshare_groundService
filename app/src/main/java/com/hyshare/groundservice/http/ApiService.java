@@ -48,4 +48,13 @@ public interface ApiService {
 
     @DELETE("v1/groundservice/WordOrders/{id}")
     Observable<BaseModel<String>> cancelClaim(@Path("id") String id);
+
+    @PUT("v1/groundservice/WordOrders/{id}/Start")
+    Observable<BaseModel<String>> startWork(@Path("id") String id, @Body RequestBody requestBody);
+
+    @PUT("v1/groundservice/GroundCars/{id}")
+    Observable<BaseModel<String>> changeCarState(@Path("id") String id, @Body RequestBody requestBody);
+
+    @POST("v1/groundservice/GroundCars/Command/")
+    Observable<BaseModel<String>> sendCommond(@Body RequestBody requestBody);
 }

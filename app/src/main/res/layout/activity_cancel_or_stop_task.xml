@@ -6,7 +6,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        android:background="#ffffff">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -25,7 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="开始工单"
+                android:text=""
                 android:textColor="#454545"
                 android:textSize="17sp" />
         </RelativeLayout>
@@ -41,7 +42,7 @@
             android:layout_height="wrap_content"
             android:textColor="#FF333333"
             android:textSize="17sp"
-            android:text="车牌号：辽A.528TQ"
+            android:text="车牌号："
             android:layout_marginLeft="12dp"
             android:layout_marginTop="20dp"/>
         <TextView
@@ -50,7 +51,7 @@
             android:layout_height="wrap_content"
             android:textColor="#999999"
             android:textSize="15sp"
-            android:text="开始时间：2018-04-23 9:34"
+            android:text="开始时间："
             android:layout_marginLeft="12dp"
             android:layout_marginTop="10dp"/>
 
@@ -77,10 +78,12 @@
             android:layout_height="150dp"
             android:layout_marginLeft="12dp"
             android:layout_marginRight="12dp"
+            android:layout_marginTop="10dp"
             android:padding="10dp"
             android:gravity="start"
             android:textColor="#999999"
-            android:textSize="15sp"/>
+            android:textSize="15sp"
+            android:background="@drawable/edit_corner_bg"/>
         <android.support.v4.widget.Space
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -91,7 +94,7 @@
             android:layout_height="wrap_content"
             android:text="立即结束"
             android:textColor="#ffffff"
-            android:background="#f85f4a"
+            android:background="@drawable/radius_button"
             android:layout_margin="12dp"/>
     </LinearLayout>
 </layout>

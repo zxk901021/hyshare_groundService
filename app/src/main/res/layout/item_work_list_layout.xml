@@ -10,7 +10,6 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="12dp"
         android:layout_marginTop="15dp"
-        android:text="辽A.536NQ"
         android:textColor="#555555"
         android:textSize="15sp" />
 
@@ -20,7 +19,6 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp"
-        android:text="2018.4.20 9:53"
         android:textColor="#555555"
         android:textSize="15sp" />
 

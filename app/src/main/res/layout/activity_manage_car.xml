@@ -5,7 +5,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="#ffffff">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -62,7 +63,6 @@
                 android:layout_marginLeft="12dp"
                 android:layout_marginTop="5dp"
                 android:layout_toRightOf="@+id/car_photo"
-                android:text="辽A.531Q"
                 android:textColor="#3f3f3f"
                 android:textSize="16sp" />
 
@@ -73,7 +73,6 @@
                 android:layout_alignBaseline="@+id/car_number"
                 android:layout_marginLeft="3dp"
                 android:layout_toRightOf="@+id/car_number"
-                android:text="起亚5座"
                 android:textColor="#999999"
                 android:textSize="14sp" />
 
@@ -95,7 +94,6 @@
                 android:layout_below="@+id/gas"
                 android:layout_marginLeft="12dp"
                 android:layout_toRightOf="@+id/car_photo"
-                android:text="距离5公里"
                 android:textColor="#999999" />
 
             <TextView
@@ -119,7 +117,6 @@
                 android:layout_marginLeft="12dp"
                 android:layout_marginTop="5dp"
                 android:layout_toRightOf="@id/car_photo"
-                android:text="空闲中"
                 android:textColor="#999999" />
 
             <TextView
@@ -130,7 +127,6 @@
                 android:layout_marginLeft="12dp"
                 android:layout_marginTop="5dp"
                 android:layout_toRightOf="@id/car_status"
-                android:text="停放：2小时5分"
                 android:textColor="#999999" />
         </RelativeLayout>
 
@@ -167,6 +163,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/state_available"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -178,6 +175,7 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/state_unavailable"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -189,6 +187,7 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/unlock"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -200,6 +199,7 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/lock"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -219,6 +219,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/unlock_relay"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -230,6 +231,7 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/lock_relay"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -241,6 +243,7 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/raise_window"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -252,6 +255,7 @@
                     android:textSize="14sp" />
 
                 <TextView
+                    android:id="@+id/search_car"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -282,7 +286,7 @@
                 android:layout_marginBottom="20dp"
                 android:layout_marginLeft="12dp"
                 android:layout_marginRight="12dp"
-                android:background="#f85f4a"
+                android:background="@drawable/radius_button"
                 android:text="结束工单"
                 android:textColor="#ffffff"
                 android:visibility="gone"/>

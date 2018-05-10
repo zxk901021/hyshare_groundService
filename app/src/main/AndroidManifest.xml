@@ -48,13 +48,12 @@
         </activity>
         <activity android:name=".activity.WorkListActivity" />
         <activity android:name=".activity.CarListActivity" />
-        <activity android:name=".activity.ManageCarActivity" />
-        <activity android:name=".activity.MyActivity" />
+        <activity android:name=".activity.ManageCarActivity" android:launchMode="singleTask"/>
         <activity android:name=".activity.CarInfoActivity" />
-        <activity android:name=".activity.CancelListActivity" />
         <activity android:name=".activity.StartWorkListActivity" />
         <activity android:name=".activity.SettingActivity" />
-        <activity android:name=".activity.CancelOrStopTaskActivity"></activity>
+        <activity android:name=".activity.CancelOrStopTaskActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden"/>
     </application>
 
 </manifest>

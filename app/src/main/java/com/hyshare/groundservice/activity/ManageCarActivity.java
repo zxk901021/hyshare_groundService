@@ -1,6 +1,7 @@
 package com.hyshare.groundservice.activity;
 
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -40,7 +41,9 @@ import com.hyshare.groundservice.model.BaseModel;
 import com.hyshare.groundservice.model.CarList;
 import com.hyshare.groundservice.model.MapPoint;
 import com.hyshare.groundservice.model.ViewModel;
+import com.hyshare.groundservice.util.DialogUtil;
 import com.hyshare.groundservice.util.SharedUtil;
+import com.hyshare.groundservice.util.TimeUtil;
 import com.hyshare.groundservice.util.ToastUtil;
 
 import java.util.HashMap;
@@ -85,7 +88,12 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                     unClaimWork();
                 }else if (orderStatus == ORDER_STATE.CANCEL_CLAIM){
                     Intent cancelTask = new Intent(context, CancelOrStopTaskActivity.class);
+                    cancelTask.putExtra("task", data.getWord_order_task());
                     cancelTask.putExtra("mode", MODE_CANCEL);
+                    cancelTask.putExtra("work_id", data.getWord_order_id());
+                    cancelTask.putExtra("id", data.getId());
+                    cancelTask.putExtra("time", data.getWord_order_start_time());
+                    cancelTask.putExtra("number", data.getNumber());
                     startActivity(cancelTask);
                 }
 
@@ -94,13 +102,46 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                 if (orderStatus == ORDER_STATE.SELF_CLAIM){
                     Intent operateTask = new Intent(context, StartWorkListActivity.class);
                     operateTask.putExtra("work_id", data.getWord_order_id());
+                    operateTask.putExtra("id", data.getId());
                     startActivity(operateTask);
                 }else if (orderStatus == ORDER_STATE.CANCEL_CLAIM){
                     Intent cancelTask = new Intent(context, CancelOrStopTaskActivity.class);
+                    cancelTask.putExtra("task", data.getWord_order_task());
                     cancelTask.putExtra("mode", MODE_STOP);
+                    cancelTask.putExtra("work_id", data.getWord_order_id());
+                    cancelTask.putExtra("id", data.getId());
+                    cancelTask.putExtra("time", data.getWord_order_start_time());
+                    cancelTask.putExtra("number", data.getNumber());
                     startActivity(cancelTask);
                 }
 
+                break;
+            case R.id.state_available:
+                changeCarState("1");
+                break;
+            case R.id.state_unavailable:
+                changeCarState("2");
+                break;
+            case R.id.unlock:
+                sendCommand("6");
+                break;
+            case R.id.lock:
+                sendCommand("7");
+                break;
+            case R.id.unlock_relay:
+                sendCommand("4");
+                break;
+            case R.id.lock_relay:
+                sendCommand("5");
+                break;
+            case R.id.raise_window:
+                sendCommand("8");
+                break;
+            case R.id.search_car:
+                sendCommand("3");
+                break;
+            case R.id.guide:
+                AmapUtil.goLocalNavApp(context, end.getLatitude(), end.getLongitude());
                 break;
         }
     }
@@ -137,6 +178,14 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
 
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        id = intent.getStringExtra("id");
+        getCarInfo(id);
+    }
+
     private void initMap() {
         aMapLocationClient = new AMapLocationClient(context);
         locationClientOption = new AMapLocationClientOption();
@@ -167,6 +216,15 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
         });
         mLayoutBinding.operateWorkList.setOnClickListener(this);
         mLayoutBinding.operateCar.setOnClickListener(this);
+        mLayoutBinding.stateAvailable.setOnClickListener(this);
+        mLayoutBinding.stateUnavailable.setOnClickListener(this);
+        mLayoutBinding.unlock.setOnClickListener(this);
+        mLayoutBinding.lock.setOnClickListener(this);
+        mLayoutBinding.unlockRelay.setOnClickListener(this);
+        mLayoutBinding.lockRelay.setOnClickListener(this);
+        mLayoutBinding.raiseWindow.setOnClickListener(this);
+        mLayoutBinding.searchCar.setOnClickListener(this);
+        mLayoutBinding.guide.setOnClickListener(this);
     }
 
     @Override
@@ -211,6 +269,10 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
         ViewModel model = setBg(bean.getClaim_state(), bean.getWord_order_state());
         mLayoutBinding.operateCar.setBackgroundResource(model.getRes());
         mLayoutBinding.operateCar.setText(model.getText());
+        if (!TextUtils.isEmpty(bean.getLast_return())){
+            mLayoutBinding.stayTime.setText("停放：" + TimeUtil.timeFormat(Long.valueOf(bean.getLast_return())));
+        }
+
         setOperateWorkBg();
         end = new LatLonPoint(Double.valueOf(bean.getLatitude()), Double.valueOf(bean.getLongitude()));
         initMap();
@@ -274,6 +336,9 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                 });
     }
 
+    /**
+     * 取消认领
+     */
     private void unClaimWork(){
         if (data != null){
             String workId = data.getWord_order_id();
@@ -306,6 +371,76 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                         });
             }
         }
+    }
+
+    /**
+     * 更改汽车状态
+     */
+    private void changeCarState(final String state){
+        if (orderStatus != ORDER_STATE.CANCEL_CLAIM){
+            DialogUtil.showDialog(context, "提示", "请开始工单后再进行操作", null, null);
+        return;
+        }
+        Map<String, Object> param = new HashMap<>();
+        param.put("state", state);
+        JSONObject object = new JSONObject(param);
+        getApiService().changeCarState(id, parseRequest(object.toString()))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<BaseModel<String>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        ToastUtil.toast(e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(BaseModel<String> stringBaseModel) {
+                        if (stringBaseModel.getCode() == 1){
+                            ToastUtil.toast(stringBaseModel.getMessage());
+                        }else ToastUtil.toast(stringBaseModel.getMessage());
+                    }
+                });
+    }
+
+    /**
+     * 发送指令
+     */
+    private void sendCommand(String command){
+        if (orderStatus != ORDER_STATE.CANCEL_CLAIM){
+            DialogUtil.showDialog(context, "提示", "请开始工单后再进行操作", null, null);
+            return;
+        }
+        Map<String, Object> param = new HashMap<>();
+        param.put("device_id", data.getDevice_no());
+        param.put("command", command);
+        param.put("car_id", id);
+        JSONObject object = new JSONObject(param);
+        getApiService().sendCommond(parseRequest(object.toString()))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<BaseModel<String>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        ToastUtil.toast(e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(BaseModel<String> stringBaseModel) {
+                        if (stringBaseModel.getCode() == 1){
+                            ToastUtil.toast(stringBaseModel.getMessage());
+                        }else ToastUtil.toast(stringBaseModel.getMessage());
+                    }
+                });
     }
 
     private ViewModel setBg(String status, String orderState) {

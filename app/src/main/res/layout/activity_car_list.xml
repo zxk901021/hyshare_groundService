@@ -5,7 +5,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="#ffffff">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -68,8 +69,9 @@
                 android:text="我的认领"
                 android:textSize="15sp"
                 android:textColor="#666666"
-                android:layout_marginTop="15dp"
-                android:layout_marginLeft="12dp"/>
+                android:paddingTop="15dp"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"/>
 
             <TextView
                 android:id="@+id/distance_order"
