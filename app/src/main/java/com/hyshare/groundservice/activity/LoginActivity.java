@@ -1,15 +1,11 @@
 package com.hyshare.groundservice.activity;
 
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
-import android.util.Log;
+import android.text.TextWatcher;
 import android.view.View;
-import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.hyshare.groundservice.R;
 import com.hyshare.groundservice.base.BaseActivity;
@@ -23,9 +19,6 @@ import com.hyshare.groundservice.util.ToastUtil;
 import java.util.HashMap;
 import java.util.Map;
 
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
-import rx.Scheduler;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -57,6 +50,62 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
             finish();
         }
 
+        mLayoutBinding.account.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editCheck()){
+                    mLayoutBinding.login.setBackgroundResource(R.drawable.shape_login_no);
+                    mLayoutBinding.login.setClickable(true);
+                }else {
+                    mLayoutBinding.login.setBackgroundResource(R.drawable.shape_login_ok);
+                    mLayoutBinding.login.setClickable(false);
+                }
+            }
+        });
+
+        mLayoutBinding.password.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editCheck()){
+                    mLayoutBinding.login.setBackgroundResource(R.drawable.shape_login_no);
+                    mLayoutBinding.login.setClickable(true);
+                }else {
+                    mLayoutBinding.login.setBackgroundResource(R.drawable.shape_login_ok);
+                    mLayoutBinding.login.setClickable(false);
+                }
+            }
+        });
+
+    }
+
+    private boolean editCheck(){
+        username = mLayoutBinding.account.getText().toString().trim();
+        password = mLayoutBinding.password.getText().toString().trim();
+        if (!TextUtils.isEmpty(username)&& !TextUtils.isEmpty(password)){
+            return true;
+        }else {
+            return false;
+        }
     }
 
     private boolean checkIsLogin() {

@@ -3,8 +3,11 @@ package com.hyshare.groundservice.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -234,6 +237,28 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
         }
     }
 
+    private void setCarStateBg(boolean available){
+        Drawable availableSelect = getResources().getDrawable(R.mipmap.car_use);
+        Drawable availableUnSelect = getResources().getDrawable(R.mipmap.car_use_unavailable);
+        Drawable unAvailableSelect = getResources().getDrawable(R.mipmap.car_unused);
+        Drawable unAvailableUnSelect = getResources().getDrawable(R.mipmap.car_unused_unavailable);
+        availableSelect.setBounds(0, 0, availableSelect.getMinimumWidth(), availableSelect.getMinimumHeight());
+        availableUnSelect.setBounds(0, 0, availableUnSelect.getMinimumWidth(), availableUnSelect.getMinimumHeight());
+        unAvailableSelect.setBounds(0, 0, unAvailableSelect.getMinimumWidth(), unAvailableSelect.getMinimumHeight());
+        unAvailableUnSelect.setBounds(0, 0, unAvailableUnSelect.getMinimumWidth(), unAvailableUnSelect.getMinimumHeight());
+        if (available){
+            mLayoutBinding.stateAvailable.setCompoundDrawables(null, availableUnSelect, null, null);
+            mLayoutBinding.stateUnavailable.setCompoundDrawables(null, unAvailableSelect, null, null);
+            mLayoutBinding.stateAvailable.setClickable(false);
+            mLayoutBinding.stateUnavailable.setClickable(true);
+        }else {
+            mLayoutBinding.stateAvailable.setCompoundDrawables(null, availableSelect, null, null);
+            mLayoutBinding.stateUnavailable.setCompoundDrawables(null, unAvailableUnSelect, null, null);
+            mLayoutBinding.stateAvailable.setClickable(true);
+            mLayoutBinding.stateUnavailable.setClickable(false);
+        }
+    }
+
     private void getCarInfo(String id) {
         getApiService().getCarInfo(id)
                 .subscribeOn(Schedulers.io())
@@ -254,6 +279,9 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                         if (carListBeanBaseModel.getCode() == 1) {
                             data = carListBeanBaseModel.getData();
                             bindUI(carListBeanBaseModel.getData());
+                            if ("1".equals(data.getState())){
+                                setCarStateBg(true);
+                            }else setCarStateBg(false);
                         }
                     }
                 });
@@ -269,6 +297,7 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
         ViewModel model = setBg(bean.getClaim_state(), bean.getWord_order_state());
         mLayoutBinding.operateCar.setBackgroundResource(model.getRes());
         mLayoutBinding.operateCar.setText(model.getText());
+        mLayoutBinding.operateCar.setTextColor(model.getTextColor());
         if (!TextUtils.isEmpty(bean.getLast_return())){
             mLayoutBinding.stayTime.setText("停放：" + TimeUtil.timeFormat(Long.valueOf(bean.getLast_return())));
         }
@@ -381,30 +410,85 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
             DialogUtil.showDialog(context, "提示", "请开始工单后再进行操作", null, null);
         return;
         }
-        Map<String, Object> param = new HashMap<>();
-        param.put("state", state);
-        JSONObject object = new JSONObject(param);
-        getApiService().changeCarState(id, parseRequest(object.toString()))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BaseModel<String>>() {
-                    @Override
-                    public void onCompleted() {
+        if ("1".equals(state)) confirmStateDialog("调为可用", state);
+        else if ("2".equals(state)) confirmStateDialog("调为不可用", state);
+    }
 
-                    }
-
+    private void confirmStateDialog(String title, final String state){
+        new AlertDialog.Builder(context)
+                .setTitle(title)
+                .setCancelable(false)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onError(Throwable e) {
-                        ToastUtil.toast(e.getMessage());
-                    }
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Map<String, Object> param = new HashMap<>();
+                        param.put("state", state);
+                        JSONObject object = new JSONObject(param);
+                        getApiService().changeCarState(id, parseRequest(object.toString()))
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Subscriber<BaseModel<String>>() {
+                                    @Override
+                                    public void onCompleted() {
 
-                    @Override
-                    public void onNext(BaseModel<String> stringBaseModel) {
-                        if (stringBaseModel.getCode() == 1){
-                            ToastUtil.toast(stringBaseModel.getMessage());
-                        }else ToastUtil.toast(stringBaseModel.getMessage());
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        ToastUtil.toast(e.getMessage());
+                                    }
+
+                                    @Override
+                                    public void onNext(BaseModel<String> stringBaseModel) {
+                                        if (stringBaseModel.getCode() == 1){
+                                            setCarStateBg(state.equals("1"));
+                                            ToastUtil.toast(stringBaseModel.getMessage());
+                                        }else ToastUtil.toast(stringBaseModel.getMessage());
+                                    }
+                                });
                     }
-                });
+                })
+                .setNegativeButton("取消", null)
+                .show();
+    }
+
+    private void confirmCommandDialog(String title, final String command){
+        new AlertDialog.Builder(context)
+                .setTitle(title)
+                .setCancelable(false)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Map<String, Object> param = new HashMap<>();
+                        param.put("device_id", data.getDevice_no());
+                        param.put("command", command);
+                        param.put("car_id", id);
+                        JSONObject object = new JSONObject(param);
+                        getApiService().sendCommond(parseRequest(object.toString()))
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Subscriber<BaseModel<String>>() {
+                                    @Override
+                                    public void onCompleted() {
+
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        ToastUtil.toast(e.getMessage());
+                                    }
+
+                                    @Override
+                                    public void onNext(BaseModel<String> stringBaseModel) {
+                                        if (stringBaseModel.getCode() == 1){
+                                            ToastUtil.toast(stringBaseModel.getMessage());
+                                        }else ToastUtil.toast(stringBaseModel.getMessage());
+                                    }
+                                });
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .show();
     }
 
     /**
@@ -415,32 +499,28 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
             DialogUtil.showDialog(context, "提示", "请开始工单后再进行操作", null, null);
             return;
         }
-        Map<String, Object> param = new HashMap<>();
-        param.put("device_id", data.getDevice_no());
-        param.put("command", command);
-        param.put("car_id", id);
-        JSONObject object = new JSONObject(param);
-        getApiService().sendCommond(parseRequest(object.toString()))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BaseModel<String>>() {
-                    @Override
-                    public void onCompleted() {
+        switch (command){
+            case "3":
+                confirmCommandDialog("寻车", command);
+                break;
+            case "4":
+                confirmCommandDialog("开继电器", command);
+                break;
+            case "5":
+                confirmCommandDialog("关继电器", command);
+                break;
+            case "6":
+                confirmCommandDialog("开锁", command);
+                break;
+            case "7":
+                confirmCommandDialog("关锁", command);
+                break;
+            case "8":
+                confirmCommandDialog("升窗", command);
+                break;
+        }
 
-                    }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        ToastUtil.toast(e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(BaseModel<String> stringBaseModel) {
-                        if (stringBaseModel.getCode() == 1){
-                            ToastUtil.toast(stringBaseModel.getMessage());
-                        }else ToastUtil.toast(stringBaseModel.getMessage());
-                    }
-                });
     }
 
     private ViewModel setBg(String status, String orderState) {
@@ -451,11 +531,13 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                     orderStatus = ORDER_STATE.UN_CLAIM;
                     model.setText("认领");
                     model.setRes(R.drawable.button_corner);
+                    model.setTextColor(Color.WHITE);
                     return model;
                 case "2":
                     orderStatus = ORDER_STATE.ALREADY_CLAIM;
                     model.setText("已被认领");
                     model.setRes(R.drawable.already_button_bg);
+                    model.setTextColor(Color.parseColor("#999999"));
                     return model;
             }
         }else {
@@ -464,11 +546,13 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                     orderStatus = ORDER_STATE.SELF_CLAIM;
                     model.setText("取消认领");
                     model.setRes(R.drawable.cancel_button_bg);
+                    model.setTextColor(Color.WHITE);
                     return model;
                 case "2":
                     orderStatus = ORDER_STATE.CANCEL_CLAIM;
                     model.setText("取消工单");
                     model.setRes(R.drawable.cancel_button_bg);
+                    model.setTextColor(Color.WHITE);
                     return model;
             }
         }

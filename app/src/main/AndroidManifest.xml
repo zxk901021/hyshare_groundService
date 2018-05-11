@@ -38,22 +38,31 @@
 
         <service android:name="com.amap.api.location.APSService" />
 
-        <activity android:name=".activity.MainActivity" />
-        <activity android:name=".activity.LoginActivity">
+        <activity android:name=".activity.MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.LoginActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.WorkListActivity" />
-        <activity android:name=".activity.CarListActivity" />
-        <activity android:name=".activity.ManageCarActivity" android:launchMode="singleTask"/>
-        <activity android:name=".activity.CarInfoActivity" />
-        <activity android:name=".activity.StartWorkListActivity" />
-        <activity android:name=".activity.SettingActivity" />
+        <activity android:name=".activity.WorkListActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.CarListActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.ManageCarActivity" android:launchMode="singleTask"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.CarInfoActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.StartWorkListActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.SettingActivity"
+            android:screenOrientation="portrait"/>
         <activity android:name=".activity.CancelOrStopTaskActivity"
-            android:windowSoftInputMode="adjustResize|stateHidden"/>
+            android:windowSoftInputMode="adjustResize|stateHidden"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

@@ -94,7 +94,7 @@ public class DrivingRouteOverlay extends RouteOverlay {
                 List<LatLonPoint> latlonPoints = step.getPolyline();
                 List<TMC> tmclist = step.getTMCs();
                 tmcs.addAll(tmclist);
-                addDrivingStationMarkers(step, convertToLatLng(latlonPoints.get(0)));
+//                addDrivingStationMarkers(step, convertToLatLng(latlonPoints.get(0)));
                 for (LatLonPoint latlonpoint : latlonPoints) {
                     mPolylineOptions.add(convertToLatLng(latlonpoint));
                     mLatLngsOfPath.add(convertToLatLng(latlonpoint));

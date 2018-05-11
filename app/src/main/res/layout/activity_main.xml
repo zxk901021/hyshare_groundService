@@ -39,12 +39,16 @@
 
             <TextView
                 android:id="@+id/user_account"
-                android:layout_width="wrap_content"
+                android:layout_width="88dp"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:background="@drawable/account_bg"
                 android:textColor="#ffffff"
                 android:textSize="14sp"
+                android:maxEms="4"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:gravity="center"
                 android:drawableStart="@mipmap/people"
                 android:drawablePadding="4dp"/>
 

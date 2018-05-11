@@ -2,6 +2,7 @@ package com.hyshare.groundservice.activity;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -46,7 +47,7 @@ import rx.schedulers.Schedulers;
 /**
  * @author Administrator
  */
-public class CarListActivity extends BaseActivity<ActivityCarListBinding> implements View.OnClickListener{
+public class CarListActivity extends BaseActivity<ActivityCarListBinding> implements View.OnClickListener {
 
     BaseQuickAdapter adapter;
     private int responseCode = 0;
@@ -58,7 +59,7 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> implem
     private static int DATA_MY = 1;
     private static int DATA_SUM = 2;
 
-    private boolean TIME_DESC = false;
+    private boolean TIME_DESC = true;
     private boolean DISTANCE_DESC = false;
 
     @Override
@@ -80,17 +81,18 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> implem
                 helper.setText(R.id.car_number, item.getNumber());
                 helper.setText(R.id.car_type, item.getBrand_name() + item.getSeat_num() + "座");
                 ((GasPercentView) helper.itemView.findViewById(R.id.gas)).init(item.getRemaining_gas());
+                helper.setTag(R.id.gas, item.getRemaining_gas());
                 helper.setText(R.id.car_status, setUseState(item.getUse_state()));
-                MapPoint end = new MapPoint(Double.valueOf(item.getLatitude()), Double.valueOf(item.getLongitude()));
-                float distance = AmapUtil.calculateLineDistance(start, end);
-                item.setDistance(distance);
-                helper.setText(R.id.distance, "距离：" + AmapUtil.format(distance / 1000) + "公里");
+                helper.setText(R.id.distance, "距离：" + AmapUtil.format(item.getDistance() / 1000) + "公里");
                 ViewModel model = setOperation(item.getClaim_state());
                 helper.setText(R.id.operate_car, model.getText());
                 if (!TextUtils.isEmpty(item.getLast_return())) {
-                    helper.setText(R.id.stay_time, "停放" + TimeUtil.timeFormat(Long.valueOf(item.getLast_return())));
+                    helper.setText(R.id.stay_time, "停放：" + TimeUtil.timeFormat(Long.valueOf(item.getLast_return())));
                 }
                 helper.setBackgroundRes(R.id.operate_car, model.getRes());
+                if (model.getText().equals("已被认领"))
+                    helper.setTextColor(R.id.operate_car, Color.parseColor("#999999"));
+                else helper.setTextColor(R.id.operate_car, Color.WHITE);
                 Glide.with(context).load(item.getImage_path()).into((ImageView) helper.getView(R.id.car_photo));
                 helper.getView(R.id.operate_car).setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -218,6 +220,15 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> implem
                         if (carListBaseModel.getCode() == 1) {
                             if (carListBaseModel.getData() != null) {
                                 sumData = carListBaseModel.getData().getRows();
+                                if (sumData.size() > 0) {
+                                    for (int i = 0, len = sumData.size(); i < len; i++) {
+                                        MapPoint end = new MapPoint(Double.valueOf(sumData.get(i).getLatitude()), Double.valueOf(sumData.get(i).getLongitude()));
+                                        float distance = AmapUtil.calculateLineDistance(start, end);
+                                        sumData.get(i).setDistance(distance);
+                                    }
+                                    Collections.sort(sumData, sortByDistanceASC(sumData));
+                                    DISTANCE_DESC = true;
+                                }
                                 myData = new ArrayList<>();
                                 for (CarList.CarListBean bean : sumData) {
                                     if ("3".equals(bean.getClaim_state())) {
@@ -235,54 +246,60 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> implem
                 });
     }
 
-    private Comparator sortByDistanceASC(List<CarList.CarListBean> data){
+    private Comparator sortByDistanceASC(List<CarList.CarListBean> data) {
         return new Comparator<CarList.CarListBean>() {
             @Override
             public int compare(CarList.CarListBean t1, CarList.CarListBean t2) {
-                if (t1.getDistance() - t2.getDistance() > 0){
+                if (t1.getDistance() - t2.getDistance() > 0) {
                     return 1;
-                }else if (t1.getDistance() - t2.getDistance() < 0){
+                } else if (t1.getDistance() - t2.getDistance() < 0) {
                     return -1;
-                }else return 0;
+                } else return 0;
             }
         };
     }
 
-    private Comparator sortByDistanceDESC(List<CarList.CarListBean> data){
+    private Comparator sortByDistanceDESC(List<CarList.CarListBean> data) {
         return new Comparator<CarList.CarListBean>() {
             @Override
             public int compare(CarList.CarListBean t1, CarList.CarListBean t2) {
-                if (t1.getDistance() - t2.getDistance() > 0){
+                if (t1.getDistance() - t2.getDistance() > 0) {
                     return -1;
-                }else if (t1.getDistance() - t2.getDistance() < 0){
+                } else if (t1.getDistance() - t2.getDistance() < 0) {
                     return 1;
-                }else return 0;
+                } else return 0;
             }
         };
     }
 
-    private Comparator sortByTimeASC(List<CarList.CarListBean> data){
+    private Comparator sortByTimeASC(List<CarList.CarListBean> data) {
         return new Comparator<CarList.CarListBean>() {
             @Override
             public int compare(CarList.CarListBean t1, CarList.CarListBean t2) {
-                if (Long.valueOf(t1.getLast_return()) - Long.valueOf(t2.getLast_return()) > 0){
-                    return -1;
-                }else if (Long.valueOf(t1.getLast_return()) - Long.valueOf(t2.getLast_return()) < 0){
-                    return 1;
-                }else return 0;
+                if (!TextUtils.isEmpty(t1.getLast_return()) && !TextUtils.isEmpty(t2.getLast_return())) {
+                    if (Long.valueOf(t1.getLast_return()) - Long.valueOf(t2.getLast_return()) > 0) {
+                        return -1;
+                    } else if (Long.valueOf(t1.getLast_return()) - Long.valueOf(t2.getLast_return()) < 0) {
+                        return 1;
+                    } else return 0;
+                }
+                return 0;
             }
         };
     }
 
-    private Comparator sortByTimeDESC(List<CarList.CarListBean> data){
+    private Comparator sortByTimeDESC(List<CarList.CarListBean> data) {
         return new Comparator<CarList.CarListBean>() {
             @Override
             public int compare(CarList.CarListBean t1, CarList.CarListBean t2) {
-                if (Long.valueOf(t1.getLast_return()) - Long.valueOf(t2.getLast_return()) > 0){
-                    return 1;
-                }else if (Long.valueOf(t1.getLast_return()) - Long.valueOf(t2.getLast_return()) < 0){
-                    return -1;
-                }else return 0;
+                if (!TextUtils.isEmpty(t1.getLast_return()) && !TextUtils.isEmpty(t2.getLast_return())) {
+                    if (Long.valueOf(t1.getLast_return()) - Long.valueOf(t2.getLast_return()) > 0) {
+                        return 1;
+                    } else if (Long.valueOf(t1.getLast_return()) - Long.valueOf(t2.getLast_return()) < 0) {
+                        return -1;
+                    } else return 0;
+                }
+                return 0;
             }
         };
     }
@@ -326,28 +343,53 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> implem
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        Drawable selected = getResources().getDrawable(R.mipmap.order_selected);
+        selected.setBounds(0, 0, selected.getMinimumWidth(), selected.getMinimumHeight());
+        Drawable unselected = getResources().getDrawable(R.mipmap.order_unselect);
+        unselected.setBounds(0, 0, unselected.getMinimumWidth(), unselected.getMinimumHeight());
+        switch (view.getId()) {
             case R.id.distance_order:
-                if (DISTANCE_DESC){
+                if (DISTANCE_DESC) {
                     if (dataMode == DATA_MY) Collections.sort(myData, sortByDistanceDESC(myData));
                     else Collections.sort(sumData, sortByDistanceDESC(sumData));
                     DISTANCE_DESC = false;
-                }else {
+                    TIME_DESC = true;
+                    mLayoutBinding.distanceOrder.setCompoundDrawables(null, null, selected, null);
+                    mLayoutBinding.distanceOrder.setTextColor(Color.parseColor("#f85f4a"));
+                    mLayoutBinding.stayTimeOrder.setCompoundDrawables(null, null, unselected, null);
+                    mLayoutBinding.stayTimeOrder.setTextColor(Color.parseColor("#666666"));
+                } else {
                     if (dataMode == DATA_MY) Collections.sort(myData, sortByDistanceASC(myData));
                     else Collections.sort(sumData, sortByDistanceASC(sumData));
                     DISTANCE_DESC = true;
+                    TIME_DESC = true;
+                    mLayoutBinding.distanceOrder.setCompoundDrawables(null, null, unselected, null);
+                    mLayoutBinding.distanceOrder.setTextColor(Color.parseColor("#666666"));
+                    mLayoutBinding.stayTimeOrder.setCompoundDrawables(null, null, unselected, null);
+                    mLayoutBinding.stayTimeOrder.setTextColor(Color.parseColor("#666666"));
                 }
                 adapter.notifyDataSetChanged();
                 break;
             case R.id.stay_time_order:
-                if (TIME_DESC){
+                if (TIME_DESC) {
                     if (dataMode == DATA_MY) Collections.sort(myData, sortByTimeDESC(myData));
                     else Collections.sort(sumData, sortByTimeDESC(sumData));
                     TIME_DESC = false;
-                }else {
+                    DISTANCE_DESC = true;
+                    mLayoutBinding.distanceOrder.setCompoundDrawables(null, null, unselected, null);
+                    mLayoutBinding.distanceOrder.setTextColor(Color.parseColor("#666666"));
+                    mLayoutBinding.stayTimeOrder.setCompoundDrawables(null, null, selected, null);
+                    mLayoutBinding.stayTimeOrder.setTextColor(Color.parseColor("#f85f4a"));
+
+                } else {
                     TIME_DESC = true;
+                    DISTANCE_DESC = true;
                     if (dataMode == DATA_MY) Collections.sort(myData, sortByTimeASC(myData));
                     else Collections.sort(sumData, sortByTimeASC(sumData));
+                    mLayoutBinding.distanceOrder.setCompoundDrawables(null, null, unselected, null);
+                    mLayoutBinding.distanceOrder.setTextColor(Color.parseColor("#666666"));
+                    mLayoutBinding.stayTimeOrder.setCompoundDrawables(null, null, unselected, null);
+                    mLayoutBinding.stayTimeOrder.setTextColor(Color.parseColor("#666666"));
                 }
                 adapter.notifyDataSetChanged();
                 break;

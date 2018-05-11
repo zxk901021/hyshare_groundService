@@ -54,7 +54,8 @@ public class WorkListActivity extends BaseActivity<ActivityWorkListBinding> {
                 ViewModel model = setWorkStatus(item.getState());
                 helper.setText(R.id.work_list_status, model.getText());
                 helper.setTextColor(R.id.work_list_status, model.getRes());
-                helper.setText(R.id.end_time, item.getEnd_time());
+                if ("2".equals(item.getState())) helper.setText(R.id.end_time, "——");
+                else helper.setText(R.id.end_time, item.getEnd_time());
                 String task = item.getTask();
                 if (!TextUtils.isEmpty(task)) {
                     if (task.contains(",")) {

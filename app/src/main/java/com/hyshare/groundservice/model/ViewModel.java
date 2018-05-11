@@ -8,6 +8,7 @@ public class ViewModel {
 
     private String text;
     private int res;
+    private int textColor;
 
     public String getText() {
         return text;
@@ -23,5 +24,13 @@ public class ViewModel {
 
     public void setRes(int res) {
         this.res = res;
+    }
+
+    public int getTextColor() {
+        return textColor;
+    }
+
+    public void setTextColor(int textColor) {
+        this.textColor = textColor;
     }
 }

@@ -81,7 +81,8 @@
             android:layout_marginTop="10dp"
             android:padding="10dp"
             android:gravity="start"
-            android:textColor="#999999"
+            android:textColorHint="#999999"
+            android:textColor="#333333"
             android:textSize="15sp"
             android:background="@drawable/edit_corner_bg"/>
         <android.support.v4.widget.Space
@@ -91,10 +92,11 @@
         <Button
             android:id="@+id/submit"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="46dp"
             android:text="立即结束"
             android:textColor="#ffffff"
             android:background="@drawable/radius_button"
-            android:layout_margin="12dp"/>
+            android:layout_margin="12dp"
+            android:textSize="17sp" />
     </LinearLayout>
 </layout>

@@ -6,8 +6,8 @@ package com.hyshare.groundservice.constant;
 
 public class RequestUrl {
 
-    public static String BASE_URL = "http://test-admin.hyshare.cn/";
+//    public static String BASE_URL = "http://test-admin.hyshare.cn/";
 
-//    public static String BASE_URL = "http://huangguoyao.hyshare.cn/";
+    public static String BASE_URL = "http://huangguoyao.hyshare.cn/";
 
 }

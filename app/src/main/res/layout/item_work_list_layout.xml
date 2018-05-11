@@ -30,6 +30,7 @@
         android:layout_marginRight="12dp"
         android:layout_marginTop="15dp"
         android:text="进行中"
+        android:gravity="start"
         android:textColor="#f85f4a"
         android:textSize="15sp" />
 
@@ -40,7 +41,8 @@
         android:layout_below="@+id/start_time"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="5dp"
-        android:text="--"
+        android:text="——"
+        android:gravity="start"
         android:textColor="#555555"
         android:textSize="15sp" />
 
