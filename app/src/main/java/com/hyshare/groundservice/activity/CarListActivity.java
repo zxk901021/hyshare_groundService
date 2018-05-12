@@ -9,7 +9,9 @@ import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -39,6 +41,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -54,13 +58,18 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> implem
     MapPoint start;
     List<CarList.CarListBean> sumData;
     List<CarList.CarListBean> myData;
+    List<CarList.CarListBean> searchData;
 
     private int dataMode = 0;
-    private static int DATA_MY = 1;
-    private static int DATA_SUM = 2;
+    private final static int DATA_MY = 1;
+    private final static int DATA_SUM = 2;
 
     private boolean TIME_DESC = true;
     private boolean DISTANCE_DESC = false;
+
+    private boolean IS_SEARCH = false;
+
+    private String searchNumber;
 
     @Override
     public int setLayoutId() {
@@ -71,6 +80,7 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> implem
     public void initUI() {
         sumData = new ArrayList<>();
         myData = new ArrayList<>();
+        searchData = new ArrayList<>();
         dataMode = DATA_SUM;
         String lat = SharedUtil.getString(context, "lat");
         String lon = SharedUtil.getString(context, "lon");
@@ -90,8 +100,7 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> implem
                     helper.setText(R.id.stay_time, "停放：" + TimeUtil.timeFormat(Long.valueOf(item.getLast_return())));
                 }
                 helper.setBackgroundRes(R.id.operate_car, model.getRes());
-                if (model.getText().equals("已被认领"))
-                    helper.setTextColor(R.id.operate_car, Color.parseColor("#999999"));
+                if (model.getText().equals("已被认领")) helper.setTextColor(R.id.operate_car, Color.parseColor("#999999"));
                 else helper.setTextColor(R.id.operate_car, Color.WHITE);
                 Glide.with(context).load(item.getImage_path()).into((ImageView) helper.getView(R.id.car_photo));
                 helper.getView(R.id.operate_car).setOnClickListener(new View.OnClickListener() {
@@ -132,23 +141,53 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> implem
                 return false;
             }
         });
+        mLayoutBinding.searchInfo.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                searchNumber = mLayoutBinding.searchInfo.getText().toString().trim();
+                findSearch();
+            }
+        });
         mLayoutBinding.myClaim.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (dataMode == DATA_MY) {
-                    adapter.setNewData(sumData);
                     mLayoutBinding.myClaim.setTextColor(Color.parseColor("#666666"));
                     dataMode = DATA_SUM;
-                } else {
-                    adapter.setNewData(myData);
+                    if (!TextUtils.isEmpty(searchNumber)) findSearch();
+                    else setResultData(sumData);
+                } else if (dataMode == DATA_SUM) {
                     mLayoutBinding.myClaim.setTextColor(Color.parseColor("#f85f4a"));
                     dataMode = DATA_MY;
+                    if (!TextUtils.isEmpty(searchNumber)) findSearch();
+                    else setResultData(myData);
                 }
-
             }
         });
         mLayoutBinding.distanceOrder.setOnClickListener(this);
         mLayoutBinding.stayTimeOrder.setOnClickListener(this);
+    }
+
+    private void findSearch() {
+        IS_SEARCH = !TextUtils.isEmpty(searchNumber);
+        if (dataMode == DATA_MY) searchData = searchData(myData, searchNumber);
+        else searchData = searchData(sumData, searchNumber);
+        setResultData(searchData);
+    }
+
+    private void setResultData(List<CarList.CarListBean> data) {
+        adapter.setNewData(data);
+        if (data.size() > 0) mLayoutBinding.carList.smoothScrollToPosition(0);
     }
 
     private String setUseState(String status) {
@@ -162,6 +201,19 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> implem
                 return state;
         }
         return state;
+    }
+
+    private List<CarList.CarListBean> searchData(List<CarList.CarListBean> data, String carNumber) {
+        if (TextUtils.isEmpty(carNumber)) return searchData = data;
+        else {
+            searchData = new ArrayList<>();
+            Pattern pattern = Pattern.compile(carNumber, Pattern.CASE_INSENSITIVE);
+            for (CarList.CarListBean bean : data) {
+                Matcher matcher = pattern.matcher(bean.getNumber());
+                if (matcher.find()) searchData.add(bean);
+            }
+            return searchData;
+        }
     }
 
     private ViewModel setOperation(String status) {
@@ -350,8 +402,12 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> implem
         switch (view.getId()) {
             case R.id.distance_order:
                 if (DISTANCE_DESC) {
-                    if (dataMode == DATA_MY) Collections.sort(myData, sortByDistanceDESC(myData));
-                    else Collections.sort(sumData, sortByDistanceDESC(sumData));
+                    if (IS_SEARCH) Collections.sort(searchData, sortByDistanceDESC(searchData));
+                    else {
+                        if (dataMode == DATA_MY)
+                            Collections.sort(myData, sortByDistanceDESC(myData));
+                        else Collections.sort(sumData, sortByDistanceDESC(sumData));
+                    }
                     DISTANCE_DESC = false;
                     TIME_DESC = true;
                     mLayoutBinding.distanceOrder.setCompoundDrawables(null, null, selected, null);
@@ -359,8 +415,12 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> implem
                     mLayoutBinding.stayTimeOrder.setCompoundDrawables(null, null, unselected, null);
                     mLayoutBinding.stayTimeOrder.setTextColor(Color.parseColor("#666666"));
                 } else {
-                    if (dataMode == DATA_MY) Collections.sort(myData, sortByDistanceASC(myData));
-                    else Collections.sort(sumData, sortByDistanceASC(sumData));
+                    if (IS_SEARCH) Collections.sort(searchData, sortByDistanceASC(searchData));
+                    else {
+                        if (dataMode == DATA_MY)
+                            Collections.sort(myData, sortByDistanceASC(myData));
+                        else Collections.sort(sumData, sortByDistanceASC(sumData));
+                    }
                     DISTANCE_DESC = true;
                     TIME_DESC = true;
                     mLayoutBinding.distanceOrder.setCompoundDrawables(null, null, unselected, null);
@@ -369,11 +429,15 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> implem
                     mLayoutBinding.stayTimeOrder.setTextColor(Color.parseColor("#666666"));
                 }
                 adapter.notifyDataSetChanged();
+                if (adapter.getData().size() > 0) mLayoutBinding.carList.smoothScrollToPosition(0);
                 break;
             case R.id.stay_time_order:
                 if (TIME_DESC) {
-                    if (dataMode == DATA_MY) Collections.sort(myData, sortByTimeDESC(myData));
-                    else Collections.sort(sumData, sortByTimeDESC(sumData));
+                    if (IS_SEARCH) Collections.sort(searchData, sortByTimeDESC(searchData));
+                    else {
+                        if (dataMode == DATA_MY) Collections.sort(myData, sortByTimeDESC(myData));
+                        else Collections.sort(sumData, sortByTimeDESC(sumData));
+                    }
                     TIME_DESC = false;
                     DISTANCE_DESC = true;
                     mLayoutBinding.distanceOrder.setCompoundDrawables(null, null, unselected, null);
@@ -384,14 +448,18 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> implem
                 } else {
                     TIME_DESC = true;
                     DISTANCE_DESC = true;
-                    if (dataMode == DATA_MY) Collections.sort(myData, sortByTimeASC(myData));
-                    else Collections.sort(sumData, sortByTimeASC(sumData));
+                    if (IS_SEARCH) Collections.sort(searchData, sortByTimeASC(searchData));
+                    else {
+                        if (dataMode == DATA_MY) Collections.sort(myData, sortByTimeASC(myData));
+                        else Collections.sort(sumData, sortByTimeASC(sumData));
+                    }
                     mLayoutBinding.distanceOrder.setCompoundDrawables(null, null, unselected, null);
                     mLayoutBinding.distanceOrder.setTextColor(Color.parseColor("#666666"));
                     mLayoutBinding.stayTimeOrder.setCompoundDrawables(null, null, unselected, null);
                     mLayoutBinding.stayTimeOrder.setTextColor(Color.parseColor("#666666"));
                 }
                 adapter.notifyDataSetChanged();
+                if (adapter.getData().size() > 0) mLayoutBinding.carList.smoothScrollToPosition(0);
                 break;
         }
     }

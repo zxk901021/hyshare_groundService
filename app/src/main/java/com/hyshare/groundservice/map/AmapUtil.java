@@ -27,11 +27,13 @@ import java.util.List;
  * Created by Administrator on 2018/5/9.
  */
 
+
 public class AmapUtil {
     public static String TAG = "AmapUtil";
 
     public static void goLocalNavApp(@NonNull final Context context, final double lat, final double lng) {
         ActionSheetDialog dialog = new ActionSheetDialog(context, new String[]{"百度地图", "高德地图 "}, null);
+        dialog.isTitleShow(false);
         dialog.setOnOperItemClickL(new OnOperItemClickL() {
             @Override
             public void onOperItemClick(AdapterView<?> parent, View view, int position, long id) {

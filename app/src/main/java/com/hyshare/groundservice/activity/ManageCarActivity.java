@@ -513,7 +513,7 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                 confirmCommandDialog("开锁", command);
                 break;
             case "7":
-                confirmCommandDialog("关锁", command);
+                confirmCommandDialog("落锁", command);
                 break;
             case "8":
                 confirmCommandDialog("升窗", command);

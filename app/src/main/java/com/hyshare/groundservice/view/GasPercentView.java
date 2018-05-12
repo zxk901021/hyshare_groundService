@@ -64,7 +64,7 @@ public class GasPercentView extends LinearLayout {
     }
 
     public void setText(String text) {
-        percentTotal.setText(subZeroAndDot(text) + "%");
+        percentTotal.setText(subZeroAndDot(text) + "%" );
     }
 
     public GasPercentView(Context context, @Nullable AttributeSet attrs) {
