@@ -164,6 +164,8 @@ public class WorkListActivity extends BaseActivity<ActivityWorkListBinding> {
                                 ToastUtil.toast(workListBaseModel.getMessage());
                                 mLayoutBinding.totalCount.setText("共计0条");
                             }
+                        }else if (workListBaseModel.getCode() == 9999){
+                            logout();
                         }
                     }
                 });

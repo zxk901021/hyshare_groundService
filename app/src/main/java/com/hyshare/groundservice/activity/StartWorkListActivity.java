@@ -139,6 +139,8 @@ public class StartWorkListActivity extends BaseActivity<ActivityStartWorkListBin
                             intent.putExtra("id", id);
                             startActivity(intent);
                             finish();
+                        }else if (stringBaseModel.getCode() == 9999){
+                            logout();
                         }else ToastUtil.toast(stringBaseModel.getMessage());
                     }
                 });

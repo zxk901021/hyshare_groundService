@@ -126,6 +126,8 @@ public class CancelOrStopTaskActivity extends BaseActivity<ActivityCancelOrStopT
                             Intent intent = new Intent(context, ManageCarActivity.class);
                             intent.putExtra("id", id);
                             startActivity(intent);
+                        }else if (stringBaseModel.getCode() == 9999){
+                            logout();
                         }else ToastUtil.toast(stringBaseModel.getMessage());
                     }
                 });

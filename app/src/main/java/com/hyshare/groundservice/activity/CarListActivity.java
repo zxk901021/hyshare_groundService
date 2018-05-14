@@ -89,10 +89,11 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> implem
         adapter = new BaseQuickAdapter<CarList.CarListBean, BaseViewHolder>(R.layout.item_car_list_layout) {
             @Override
             protected void convert(BaseViewHolder helper, final CarList.CarListBean item) {
+//                helper.setIsRecyclable(false);
                 helper.setText(R.id.car_number, item.getNumber());
                 helper.setText(R.id.car_type, item.getBrand_name() + item.getSeat_num() + "座");
+                GasPercentView gas = helper.itemView.findViewById(R.id.gas);
                 ((GasPercentView) helper.itemView.findViewById(R.id.gas)).init(item.getRemaining_gas());
-                helper.setTag(R.id.gas, item.getRemaining_gas());
                 helper.setText(R.id.car_status, setUseState(item.getUse_state()));
                 helper.setText(R.id.distance, "距离：" + AmapUtil.format(item.getDistance() / 1000) + "公里");
                 ViewModel model = setOperation(item.getClaim_state());
@@ -276,9 +277,9 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> implem
                                 if (sumData.size() > 0) {
                                     for (int i = 0, len = sumData.size(); i < len; i++) {
                                         double[] location = GPSUtil.gps84_To_Gcj02(Double.valueOf(sumData.get(i).getLatitude()), Double.valueOf(sumData.get(i).getLongitude()));
-                                        sumData.get(i).setLatitude(String.valueOf(sumData.get(i).getLatitude()));
-                                        sumData.get(i).setLongitude(String.valueOf(sumData.get(i).getLongitude()));
-                                        MapPoint end = new MapPoint(Double.valueOf(sumData.get(i).getLatitude()), Double.valueOf(sumData.get(i).getLongitude()));
+                                        sumData.get(i).setLatitude(String.valueOf(location[0]));
+                                        sumData.get(i).setLongitude(String.valueOf(location[1]));
+                                        MapPoint end = new MapPoint(location[0], location[1]);
                                         float distance = AmapUtil.calculateLineDistance(start, end);
                                         sumData.get(i).setDistance(distance);
                                     }
@@ -297,6 +298,8 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> implem
                             } else {
                                 ToastUtil.toast(carListBaseModel.getMessage());
                             }
+                        }else if (carListBaseModel.getCode() == 9999){
+                            logout();
                         }
                     }
                 });

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/pop_layout_bg">
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/progress_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/progress_bar_layout">
+
+            <com.daimajia.numberprogressbar.NumberProgressBar
+                android:id="@+id/number_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="3dp"
+                app:progress_reached_bar_height="2dp"
+                app:progress_reached_color="#333333"
+                app:progress_text_visibility="invisible"
+                app:progress_unreached_bar_height="2dp"
+                app:progress_unreached_color="#e2e2e2" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/progress_layout"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:textColor="#333333"
+            android:textSize="14sp"/>
+    </LinearLayout>
+
+</RelativeLayout>

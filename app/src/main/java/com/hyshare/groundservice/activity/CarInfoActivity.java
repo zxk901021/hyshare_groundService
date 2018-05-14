@@ -55,6 +55,8 @@ public class CarInfoActivity extends BaseActivity<ActivityCarInfoBinding> {
                     public void onNext(BaseModel<CarList.CarListBean> carListBeanBaseModel) {
                         if (carListBeanBaseModel.getCode() == 1){
                             bindUI(carListBeanBaseModel.getData());
+                        }else if (carListBeanBaseModel.getCode() == 9999){
+                            logout();
                         }
                     }
                 });

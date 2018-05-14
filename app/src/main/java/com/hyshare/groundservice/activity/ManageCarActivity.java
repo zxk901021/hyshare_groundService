@@ -5,8 +5,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.View;
@@ -31,6 +33,7 @@ import com.amap.api.services.route.DrivePath;
 import com.amap.api.services.route.DriveRouteResult;
 import com.amap.api.services.route.RideRouteResult;
 import com.amap.api.services.route.RouteSearch;
+import com.amap.api.services.route.WalkPath;
 import com.amap.api.services.route.WalkRouteResult;
 import com.bumptech.glide.Glide;
 import com.hyshare.groundservice.R;
@@ -41,6 +44,7 @@ import com.hyshare.groundservice.map.AMapModel;
 import com.hyshare.groundservice.map.AmapUtil;
 import com.hyshare.groundservice.map.DrivingRouteOverlay;
 import com.hyshare.groundservice.map.GPSUtil;
+import com.hyshare.groundservice.map.WalkRouteOverlay;
 import com.hyshare.groundservice.model.BaseModel;
 import com.hyshare.groundservice.model.CarList;
 import com.hyshare.groundservice.model.MapPoint;
@@ -284,10 +288,12 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                                 data.setLatitude(String.valueOf(location[0]));
                                 data.setLongitude(String.valueOf(location[1]));
                             }
-                            bindUI(carListBeanBaseModel.getData());
+                            bindUI(data);
                             if ("1".equals(data.getState())){
                                 setCarStateBg(true);
                             }else setCarStateBg(false);
+                        }else if (carListBeanBaseModel.getCode() == 9999){
+                            logout();
                         }
                     }
                 });
@@ -366,6 +372,8 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                             ToastUtil.toast("车辆认领成功");
                             orderStatus = ORDER_STATE.SELF_CLAIM;
                             getCarInfo(id);
+                        }else if (stringBaseModel.getCode() == 9999){
+                            logout();
                         }
                     }
                 });
@@ -398,6 +406,8 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                                     ToastUtil.toast("已取消认领");
                                     orderStatus = ORDER_STATE.UN_CLAIM;
                                     getCarInfo(id);
+                                }else if (stringBaseModel.getCode() == 9999){
+                                    logout();
                                 }else {
                                     ToastUtil.toast(stringBaseModel.getMessage());
                                 }
@@ -449,6 +459,8 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                                         if (stringBaseModel.getCode() == 1){
                                             setCarStateBg(state.equals("1"));
                                             ToastUtil.toast(stringBaseModel.getMessage());
+                                        }else if (stringBaseModel.getCode() == 9999){
+                                            logout();
                                         }else ToastUtil.toast(stringBaseModel.getMessage());
                                     }
                                 });
@@ -458,11 +470,12 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                 .show();
     }
 
-    private void confirmCommandDialog(String title, final String command){
+    private void confirmCommandDialog(final String title, final String command){
         new AlertDialog.Builder(context)
                 .setTitle(title)
                 .setCancelable(false)
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Map<String, Object> param = new HashMap<>();
@@ -470,6 +483,8 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                         param.put("command", command);
                         param.put("car_id", id);
                         JSONObject object = new JSONObject(param);
+                        DialogUtil.showProgressDialog(context, title + "中...", mLayoutBinding.parentView);
+                        DialogUtil.startShowProgress();
                         getApiService().sendCommond(parseRequest(object.toString()))
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -481,13 +496,17 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
 
                                     @Override
                                     public void onError(Throwable e) {
+                                        DialogUtil.showMaxProgress();
                                         ToastUtil.toast(e.getMessage());
                                     }
 
                                     @Override
                                     public void onNext(BaseModel<String> stringBaseModel) {
+                                        DialogUtil.showMaxProgress();
                                         if (stringBaseModel.getCode() == 1){
                                             ToastUtil.toast(stringBaseModel.getMessage());
+                                        }else if (stringBaseModel.getCode() == 9999){
+                                            logout();
                                         }else ToastUtil.toast(stringBaseModel.getMessage());
                                     }
                                 });
@@ -630,7 +649,16 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
      */
     @Override
     public void onWalkRouteSearched(WalkRouteResult walkRouteResult, int i) {
-
+        map.clear();
+        WalkPath walkPath = walkRouteResult.getPaths().get(0);
+        WalkRouteOverlay walkRouteOverlay = new WalkRouteOverlay(context, map, walkPath, start, end);
+        walkRouteOverlay.removeFromMap();
+        walkRouteOverlay.addToMap();
+        walkRouteOverlay.zoomToSpan(-1, -1);
+        MarkerOptions options = new MarkerOptions();
+        if ("2".equals(data.getUse_state())) options.icon(BitmapDescriptorFactory.fromResource(R.mipmap.main_greencar)).position(new LatLng(end.getLatitude(), end.getLongitude()));
+        else if ("1".equals(data.getUse_state())) options.icon(BitmapDescriptorFactory.fromResource(R.mipmap.main_redcar)).position(new LatLng(end.getLatitude(), end.getLongitude()));
+        map.addMarker(options);
     }
 
     /**
@@ -662,9 +690,16 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                 start = new LatLonPoint(lat, lon);
                 String distance = AmapUtil.format(AmapUtil.calculateLineDistance(new MapPoint(lat, lon), new MapPoint(end.getLatitude(), end.getLongitude())) / 1000);
                 mLayoutBinding.distance.setText("距离：" + distance + "公里");
-                RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(start, end);
-                RouteSearch.DriveRouteQuery driveRouteQuery = new RouteSearch.DriveRouteQuery(fromAndTo, 0, null, null, null);
-                routeSearch.calculateDriveRouteAsyn(driveRouteQuery);
+                if (Float.valueOf(distance) > 1f){
+                    RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(start, end);
+                    RouteSearch.DriveRouteQuery driveRouteQuery = new RouteSearch.DriveRouteQuery(fromAndTo, 0, null, null, null);
+                    routeSearch.calculateDriveRouteAsyn(driveRouteQuery);
+                }else {
+                    RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(start, end);
+                    RouteSearch.WalkRouteQuery walkRouteQuery = new RouteSearch.WalkRouteQuery(fromAndTo);
+                    routeSearch.calculateWalkRouteAsyn(walkRouteQuery);
+                }
+
             } else {
                 lat = Double.valueOf(SharedUtil.getString(context, KeyConstant.LAT, "0"));
                 lon = Double.valueOf(SharedUtil.getString(context, KeyConstant.LON, "0"));
