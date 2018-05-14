@@ -40,6 +40,7 @@ import com.hyshare.groundservice.databinding.ActivityManageCarBinding;
 import com.hyshare.groundservice.map.AMapModel;
 import com.hyshare.groundservice.map.AmapUtil;
 import com.hyshare.groundservice.map.DrivingRouteOverlay;
+import com.hyshare.groundservice.map.GPSUtil;
 import com.hyshare.groundservice.model.BaseModel;
 import com.hyshare.groundservice.model.CarList;
 import com.hyshare.groundservice.model.MapPoint;
@@ -278,6 +279,11 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                     public void onNext(BaseModel<CarList.CarListBean> carListBeanBaseModel) {
                         if (carListBeanBaseModel.getCode() == 1) {
                             data = carListBeanBaseModel.getData();
+                            if (data != null){
+                                double[] location = GPSUtil.gps84_To_Gcj02(Double.valueOf(data.getLatitude()), Double.valueOf(data.getLongitude()));
+                                data.setLatitude(String.valueOf(location[0]));
+                                data.setLongitude(String.valueOf(location[1]));
+                            }
                             bindUI(carListBeanBaseModel.getData());
                             if ("1".equals(data.getState())){
                                 setCarStateBg(true);
@@ -611,7 +617,8 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
         routeOverlay.addToMap();
         routeOverlay.zoomToSpan(-1, -1);
         MarkerOptions options = new MarkerOptions();
-        options.icon(BitmapDescriptorFactory.fromResource(R.mipmap.main_greencar)).position(new LatLng(end.getLatitude(), end.getLongitude()));
+        if ("2".equals(data.getUse_state())) options.icon(BitmapDescriptorFactory.fromResource(R.mipmap.main_greencar)).position(new LatLng(end.getLatitude(), end.getLongitude()));
+        else if ("1".equals(data.getUse_state())) options.icon(BitmapDescriptorFactory.fromResource(R.mipmap.main_redcar)).position(new LatLng(end.getLatitude(), end.getLongitude()));
         map.addMarker(options);
     }
 

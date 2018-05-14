@@ -26,6 +26,7 @@ import com.hyshare.groundservice.R;
 import com.hyshare.groundservice.base.BaseActivity;
 import com.hyshare.groundservice.databinding.ActivityCarListBinding;
 import com.hyshare.groundservice.map.AmapUtil;
+import com.hyshare.groundservice.map.GPSUtil;
 import com.hyshare.groundservice.model.BaseModel;
 import com.hyshare.groundservice.model.CarList;
 import com.hyshare.groundservice.model.MapPoint;
@@ -274,6 +275,9 @@ public class CarListActivity extends BaseActivity<ActivityCarListBinding> implem
                                 sumData = carListBaseModel.getData().getRows();
                                 if (sumData.size() > 0) {
                                     for (int i = 0, len = sumData.size(); i < len; i++) {
+                                        double[] location = GPSUtil.gps84_To_Gcj02(Double.valueOf(sumData.get(i).getLatitude()), Double.valueOf(sumData.get(i).getLongitude()));
+                                        sumData.get(i).setLatitude(String.valueOf(sumData.get(i).getLatitude()));
+                                        sumData.get(i).setLongitude(String.valueOf(sumData.get(i).getLongitude()));
                                         MapPoint end = new MapPoint(Double.valueOf(sumData.get(i).getLatitude()), Double.valueOf(sumData.get(i).getLongitude()));
                                         float distance = AmapUtil.calculateLineDistance(start, end);
                                         sumData.get(i).setDistance(distance);
