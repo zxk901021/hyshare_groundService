@@ -25,6 +25,11 @@ import com.kaopiz.kprogresshud.KProgressHUD;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
 /**
  * Created by Administrator on 2018/5/7.
  */
@@ -66,10 +71,13 @@ public class DialogUtil {
         }
     }
 
-    static NumberProgressBar progressBar;
-    static Timer timer;
-    static int currentProgress;
-    static PopupWindow pop;
+    private static NumberProgressBar progressBar;
+    private static Timer timer;
+    private static PopupWindow pop;
+    private static TimerTask task;
+    private final static int MODE_LOADING = 1;
+    private final static int MODE_FINISHED = 2;
+    private static int currentMode = 0;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public static void showProgressDialog(Context context, String title, View parent) {
@@ -78,36 +86,88 @@ public class DialogUtil {
         TextView message = view.findViewById(R.id.title);
         message.setText(title);
 
-        progressBar.setOnProgressBarListener(new OnProgressBarListener() {
-            @Override
-            public void onProgressChange(int current, int max) {
-                currentProgress = current;
-            }
-        });
         pop = new PopupWindow(view, 580, 250);
         pop.setOutsideTouchable(false);
         pop.setElevation(10);
         pop.update();
         pop.showAtLocation(parent, Gravity.CENTER, 0, 80);
-//        progressDialog.setView(view);
-//        progressDialog.show();
+
+        progressBar.setOnProgressBarListener(new OnProgressBarListener() {
+            @Override
+            public void onProgressChange(int current, int max) {
+                if (current >= 100) {
+                    if (currentMode == MODE_FINISHED) {
+                        pop.dismiss();
+                        task.cancel();
+                        timer.cancel();
+                        progressBar.setOnProgressBarListener(null);
+                        currentMode = MODE_LOADING;
+                    }
+                }
+            }
+        });
     }
 
-    public static void startShowProgress(){
+    public static void startShowProgress() {
+        currentMode = MODE_LOADING;
         timer = new Timer();
-        timer.schedule(new TimerTask() {
+        timer.purge();
+        task = new TimerTask() {
             @Override
             public void run() {
-                progressBar.incrementProgressBy(1);
+                Observable.just(1)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<Integer>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onNext(Integer integer) {
+                                progressBar.incrementProgressBy(1);
+                            }
+                        });
             }
-        }, 1000, 1000);
-    }
-    public static int getCurrentProgress(){
-        return currentProgress;
+        };
+        timer.schedule(task, 500, 100);
+
     }
 
-    public static void showMaxProgress(){
-        progressBar.setProgress(100);
-        pop.dismiss();
+    public static void showMaxProgress() {
+        currentMode = MODE_FINISHED;
+        task.cancel();
+        timer.purge();
+        task = new TimerTask() {
+            @Override
+            public void run() {
+                Observable.just(1)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<Integer>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onNext(Integer integer) {
+                                progressBar.incrementProgressBy(1);
+                            }
+                        });
+            }
+        };
+        timer.schedule(task, 0, 10);
+
+
     }
 }

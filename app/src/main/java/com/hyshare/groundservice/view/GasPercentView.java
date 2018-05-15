@@ -52,14 +52,16 @@ public class GasPercentView extends LinearLayout {
         percents.add(percent8);
         percents.add(percent9);
         percents.add(percent10);
-        if (percent >= 10) {
+        if (percent > 10) {
             return;
         }
         if (percent < 0) {
             return;
         }
-        for (int i = percent; i < 10; i++) {
-            percents.get(i).setBackgroundResource(R.mipmap.percent_no);
+        for (int i = 0; i < 10; i++) {
+            if (i < percent){
+                percents.get(i).setBackgroundResource(R.mipmap.percent_yes);
+            }else percents.get(i).setBackgroundResource(R.mipmap.percent_no);
         }
     }
 
