@@ -6,8 +6,6 @@ import com.hyshare.groundservice.model.CarList;
 import com.hyshare.groundservice.model.LoginBean;
 import com.hyshare.groundservice.model.WorkList;
 
-import java.util.Map;
-
 import okhttp3.RequestBody;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -16,7 +14,6 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
-import retrofit2.http.QueryMap;
 import rx.Observable;
 
 /**
@@ -56,5 +53,6 @@ public interface ApiService {
     Observable<BaseModel<String>> changeCarState(@Path("id") String id, @Body RequestBody requestBody);
 
     @POST("v1/groundservice/GroundCars/Command/")
-    Observable<BaseModel<String>> sendCommond(@Body RequestBody requestBody);
+    Observable<BaseModel<String>> sendCommand(@Body RequestBody requestBody);
+
 }

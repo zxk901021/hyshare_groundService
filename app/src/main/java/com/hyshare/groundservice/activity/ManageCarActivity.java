@@ -310,6 +310,7 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
         mLayoutBinding.operateCar.setBackgroundResource(model.getRes());
         mLayoutBinding.operateCar.setText(model.getText());
         mLayoutBinding.operateCar.setTextColor(model.getTextColor());
+        mLayoutBinding.claimant.setText(bean.getUser_name());
         if (!TextUtils.isEmpty(bean.getLast_return())){
             mLayoutBinding.stayTime.setText("停放：" + TimeUtil.timeFormat(Long.valueOf(bean.getLast_return())));
         }
@@ -485,7 +486,7 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                         JSONObject object = new JSONObject(param);
                         DialogUtil.showProgressDialog(context, title + "中...", mLayoutBinding.parentView);
                         DialogUtil.startShowProgress();
-                        getApiService().sendCommond(parseRequest(object.toString()))
+                        getApiService().sendCommand(parseRequest(object.toString()))
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(new Subscriber<BaseModel<String>>() {

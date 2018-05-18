@@ -64,6 +64,7 @@ public class CarList {
         private String word_order_task;
         private String word_order_id;
         private float distance;
+        private String user_name;
 
         public String getId() {
             return id;
@@ -351,6 +352,14 @@ public class CarList {
 
         public void setDistance(float distance) {
             this.distance = distance;
+        }
+
+        public String getUser_name() {
+            return user_name;
+        }
+
+        public void setUser_name(String user_name) {
+            this.user_name = user_name;
         }
     }
 }
