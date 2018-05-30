@@ -83,6 +83,6 @@
         android:layout_marginLeft="10dp"
         android:text="50%"
         android:textColor="#f85f4a"
-        android:textSize="14sp" />
+        android:textSize="13sp" />
 
 </LinearLayout>

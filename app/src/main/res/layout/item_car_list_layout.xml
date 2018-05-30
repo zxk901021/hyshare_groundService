@@ -19,7 +19,7 @@
         android:layout_marginStart="12dp"
         android:layout_toEndOf="@+id/car_photo"
         android:textColor="#3f3f3f"
-        android:textSize="15sp" />
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/car_type"
@@ -29,7 +29,7 @@
         android:layout_marginStart="3dp"
         android:layout_toEndOf="@+id/car_number"
         android:textColor="#999999"
-        android:textSize="12sp"
+        android:textSize="13sp"
         android:layout_marginLeft="4dp"/>
 
     <com.hyshare.groundservice.view.GasPercentView
@@ -49,7 +49,7 @@
         android:layout_marginStart="12dp"
         android:layout_toEndOf="@+id/car_photo"
         android:textColor="#999999"
-        android:textSize="12sp"
+        android:textSize="13sp"
         android:layout_marginTop="2dp"/>
 
     <TextView
@@ -73,7 +73,7 @@
         android:layout_marginStart="12dp"
         android:layout_toEndOf="@id/car_photo"
         android:textColor="#999999"
-        android:textSize="12sp"
+        android:textSize="13sp"
         android:layout_marginTop="2dp"/>
 
     <TextView
@@ -84,7 +84,7 @@
         android:layout_marginStart="12dp"
         android:layout_toEndOf="@id/car_status"
         android:textColor="#999999"
-        android:textSize="12sp"
+        android:textSize="13sp"
         android:layout_marginTop="2dp"/>
 
 </RelativeLayout>

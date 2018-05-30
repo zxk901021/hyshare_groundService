@@ -310,7 +310,13 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
         mLayoutBinding.operateCar.setBackgroundResource(model.getRes());
         mLayoutBinding.operateCar.setText(model.getText());
         mLayoutBinding.operateCar.setTextColor(model.getTextColor());
-        mLayoutBinding.claimant.setText(bean.getUser_name());
+        if (TextUtils.isEmpty(bean.getUser_name())){
+            mLayoutBinding.claimant.setVisibility(View.GONE);
+        }else {
+            mLayoutBinding.claimant.setVisibility(View.VISIBLE);
+            mLayoutBinding.claimant.setText(bean.getUser_name());
+        }
+
         if (!TextUtils.isEmpty(bean.getLast_return())){
             mLayoutBinding.stayTime.setText("停放：" + TimeUtil.timeFormat(Long.valueOf(bean.getLast_return())));
         }
@@ -429,6 +435,36 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
         }
         if ("1".equals(state)) confirmStateDialog("调为可用", state);
         else if ("2".equals(state)) confirmStateDialog("调为不可用", state);
+    }
+
+    /**
+     * 查询车辆是否有订单
+     *
+     */
+    private void checkOrderState(String id){
+        getApiService().checkOrderState(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<BaseModel<String>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(BaseModel<String> stringBaseModel) {
+                        if (stringBaseModel.getCode() == 1){
+                            if ("1".equals(stringBaseModel.getData())){
+
+                            }
+                        }
+                    }
+                });
     }
 
     private void confirmStateDialog(String title, final String state){

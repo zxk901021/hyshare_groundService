@@ -55,4 +55,7 @@ public interface ApiService {
     @POST("v1/groundservice/GroundCars/Command/")
     Observable<BaseModel<String>> sendCommand(@Body RequestBody requestBody);
 
+    @GET("v1/groundservice/GroundCars/{id}/isOrderByCarId")
+    Observable<BaseModel<String>> checkOrderState(@Path("id") String id);
+
 }

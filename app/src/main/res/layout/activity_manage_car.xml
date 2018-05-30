@@ -50,28 +50,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <FrameLayout
-                android:id="@+id/car_photo_layout"
+
+            <ImageView
+                android:id="@+id/car_photo"
                 android:layout_width="100dp"
                 android:layout_height="50dp"
                 android:layout_marginLeft="12dp"
-                android:layout_marginTop="25dp">
-
-                <ImageView
-                    android:id="@+id/car_photo"
-                    android:layout_width="100dp"
-                    android:layout_height="50dp" />
-
-                <TextView
-                    android:id="@+id/claimant"
-                    android:layout_width="100dp"
-                    android:layout_height="25dp"
-                    android:layout_gravity="center_vertical"
-                    android:background="@mipmap/claimant"
-                    android:gravity="center"
-                    android:textColor="#476194"
-                    android:textSize="14sp" />
-            </FrameLayout>
+                android:layout_marginTop="25dp" />
 
 
             <TextView
@@ -79,8 +64,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="12dp"
-                android:layout_marginTop="5dp"
-                android:layout_toRightOf="@+id/car_photo_layout"
+                android:layout_marginTop="12dp"
+                android:layout_toRightOf="@+id/car_photo"
                 android:textColor="#3f3f3f"
                 android:textSize="16sp" />
 
@@ -90,9 +75,10 @@
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@+id/car_number"
                 android:layout_marginLeft="3dp"
+                android:layout_marginTop="12dp"
                 android:layout_toRightOf="@+id/car_number"
                 android:textColor="#999999"
-                android:textSize="14sp" />
+                android:textSize="13sp" />
 
             <com.hyshare.groundservice.view.GasPercentView
                 android:id="@+id/gas"
@@ -101,9 +87,9 @@
                 android:layout_below="@+id/car_number"
                 android:layout_marginLeft="12dp"
                 android:layout_marginTop="5dp"
-                android:layout_toRightOf="@id/car_photo_layout"
+                android:layout_toRightOf="@id/car_photo"
                 android:textColor="#f85f4a"
-                android:textSize="14sp" />
+                android:textSize="13sp" />
 
             <TextView
                 android:id="@+id/distance"
@@ -111,8 +97,9 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/gas"
                 android:layout_marginLeft="12dp"
-                android:layout_toRightOf="@+id/car_photo_layout"
-                android:textColor="#999999" />
+                android:layout_toRightOf="@+id/car_photo"
+                android:textColor="#999999"
+                android:textSize="13sp"/>
 
             <TextView
                 android:id="@+id/operate_car"
@@ -125,7 +112,22 @@
                 android:gravity="center"
                 android:text="认领"
                 android:textColor="#ffffff"
-                android:textSize="14sp" />
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/claimant"
+                android:layout_width="65dp"
+                android:layout_height="25dp"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/operate_car"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="12dp"
+                android:gravity="center"
+                android:textColor="#476194"
+                android:textSize="13sp"
+                android:maxEms="4"
+                android:ellipsize="end"
+                android:singleLine="true"/>
 
             <TextView
                 android:id="@+id/car_status"
@@ -134,8 +136,9 @@
                 android:layout_below="@+id/distance"
                 android:layout_marginLeft="12dp"
                 android:layout_marginTop="5dp"
-                android:layout_toRightOf="@id/car_photo_layout"
-                android:textColor="#999999" />
+                android:layout_toRightOf="@id/car_photo"
+                android:textColor="#999999"
+                android:textSize="13sp"/>
 
             <TextView
                 android:id="@+id/stay_time"
@@ -145,7 +148,8 @@
                 android:layout_marginLeft="12dp"
                 android:layout_marginTop="5dp"
                 android:layout_toRightOf="@id/car_status"
-                android:textColor="#999999" />
+                android:textColor="#999999"
+                android:textSize="13sp"/>
         </RelativeLayout>
 
         <TextView
