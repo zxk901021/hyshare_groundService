@@ -85,16 +85,18 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
     private CarList.CarListBean data;
     public static final int MODE_CANCEL = 1;
     public static final int MODE_STOP = 2;
+    private static final String warnTips = "车辆正在使用中，是否确认";
+    private boolean ordered = false;
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.operate_car:
-                if (orderStatus == ORDER_STATE.UN_CLAIM){
+                if (orderStatus == ORDER_STATE.UN_CLAIM) {
                     claimWork();
-                }else if (orderStatus == ORDER_STATE.SELF_CLAIM){
+                } else if (orderStatus == ORDER_STATE.SELF_CLAIM) {
                     unClaimWork();
-                }else if (orderStatus == ORDER_STATE.CANCEL_CLAIM){
+                } else if (orderStatus == ORDER_STATE.CANCEL_CLAIM) {
                     Intent cancelTask = new Intent(context, CancelOrStopTaskActivity.class);
                     cancelTask.putExtra("task", data.getWord_order_task());
                     cancelTask.putExtra("mode", MODE_CANCEL);
@@ -107,12 +109,12 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
 
                 break;
             case R.id.operate_work_list:
-                if (orderStatus == ORDER_STATE.SELF_CLAIM){
+                if (orderStatus == ORDER_STATE.SELF_CLAIM) {
                     Intent operateTask = new Intent(context, StartWorkListActivity.class);
                     operateTask.putExtra("work_id", data.getWord_order_id());
                     operateTask.putExtra("id", data.getId());
                     startActivity(operateTask);
-                }else if (orderStatus == ORDER_STATE.CANCEL_CLAIM){
+                } else if (orderStatus == ORDER_STATE.CANCEL_CLAIM) {
                     Intent cancelTask = new Intent(context, CancelOrStopTaskActivity.class);
                     cancelTask.putExtra("task", data.getWord_order_task());
                     cancelTask.putExtra("mode", MODE_STOP);
@@ -125,28 +127,28 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
 
                 break;
             case R.id.state_available:
-                changeCarState("1");
+                checkOrderState("1");
                 break;
             case R.id.state_unavailable:
-                changeCarState("2");
+                checkOrderState("2");
                 break;
             case R.id.unlock:
-                sendCommand("6");
+                checkOrderState("6");
                 break;
             case R.id.lock:
-                sendCommand("7");
+                checkOrderState("7");
                 break;
             case R.id.unlock_relay:
-                sendCommand("4");
+                checkOrderState("4");
                 break;
             case R.id.lock_relay:
-                sendCommand("5");
+                checkOrderState("5");
                 break;
             case R.id.raise_window:
-                sendCommand("8");
+                checkOrderState("8");
                 break;
             case R.id.search_car:
-                sendCommand("3");
+                checkOrderState("3");
                 break;
             case R.id.guide:
                 AmapUtil.goLocalNavApp(context, end.getLatitude(), end.getLongitude());
@@ -242,7 +244,7 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
         }
     }
 
-    private void setCarStateBg(boolean available){
+    private void setCarStateBg(boolean available) {
         Drawable availableSelect = getResources().getDrawable(R.mipmap.car_use);
         Drawable availableUnSelect = getResources().getDrawable(R.mipmap.car_use_unavailable);
         Drawable unAvailableSelect = getResources().getDrawable(R.mipmap.car_unused);
@@ -251,12 +253,12 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
         availableUnSelect.setBounds(0, 0, availableUnSelect.getMinimumWidth(), availableUnSelect.getMinimumHeight());
         unAvailableSelect.setBounds(0, 0, unAvailableSelect.getMinimumWidth(), unAvailableSelect.getMinimumHeight());
         unAvailableUnSelect.setBounds(0, 0, unAvailableUnSelect.getMinimumWidth(), unAvailableUnSelect.getMinimumHeight());
-        if (available){
+        if (available) {
             mLayoutBinding.stateAvailable.setCompoundDrawables(null, availableUnSelect, null, null);
             mLayoutBinding.stateUnavailable.setCompoundDrawables(null, unAvailableSelect, null, null);
             mLayoutBinding.stateAvailable.setClickable(false);
             mLayoutBinding.stateUnavailable.setClickable(true);
-        }else {
+        } else {
             mLayoutBinding.stateAvailable.setCompoundDrawables(null, availableSelect, null, null);
             mLayoutBinding.stateUnavailable.setCompoundDrawables(null, unAvailableUnSelect, null, null);
             mLayoutBinding.stateAvailable.setClickable(true);
@@ -283,16 +285,16 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                     public void onNext(BaseModel<CarList.CarListBean> carListBeanBaseModel) {
                         if (carListBeanBaseModel.getCode() == 1) {
                             data = carListBeanBaseModel.getData();
-                            if (data != null){
+                            if (data != null) {
                                 double[] location = GPSUtil.gps84_To_Gcj02(Double.valueOf(data.getLatitude()), Double.valueOf(data.getLongitude()));
                                 data.setLatitude(String.valueOf(location[0]));
                                 data.setLongitude(String.valueOf(location[1]));
                             }
                             bindUI(data);
-                            if ("1".equals(data.getState())){
+                            if ("1".equals(data.getState())) {
                                 setCarStateBg(true);
-                            }else setCarStateBg(false);
-                        }else if (carListBeanBaseModel.getCode() == 9999){
+                            } else setCarStateBg(false);
+                        } else if (carListBeanBaseModel.getCode() == 9999) {
                             logout();
                         }
                     }
@@ -310,14 +312,14 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
         mLayoutBinding.operateCar.setBackgroundResource(model.getRes());
         mLayoutBinding.operateCar.setText(model.getText());
         mLayoutBinding.operateCar.setTextColor(model.getTextColor());
-        if (TextUtils.isEmpty(bean.getUser_name())){
+        if (TextUtils.isEmpty(bean.getUser_name())) {
             mLayoutBinding.claimant.setVisibility(View.GONE);
-        }else {
+        } else {
             mLayoutBinding.claimant.setVisibility(View.VISIBLE);
             mLayoutBinding.claimant.setText(bean.getUser_name());
         }
 
-        if (!TextUtils.isEmpty(bean.getLast_return())){
+        if (!TextUtils.isEmpty(bean.getLast_return())) {
             mLayoutBinding.stayTime.setText("停放：" + TimeUtil.timeFormat(Long.valueOf(bean.getLast_return())));
         }
 
@@ -329,14 +331,14 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
 
     }
 
-    private void setOperateWorkBg(){
-        if (orderStatus == ORDER_STATE.SELF_CLAIM){
+    private void setOperateWorkBg() {
+        if (orderStatus == ORDER_STATE.SELF_CLAIM) {
             mLayoutBinding.operateWorkList.setVisibility(View.VISIBLE);
             mLayoutBinding.operateWorkList.setText("开始工单");
-        }else if (orderStatus == ORDER_STATE.CANCEL_CLAIM){
+        } else if (orderStatus == ORDER_STATE.CANCEL_CLAIM) {
             mLayoutBinding.operateWorkList.setVisibility(View.VISIBLE);
             mLayoutBinding.operateWorkList.setText("结束工单");
-        }else {
+        } else {
             mLayoutBinding.operateWorkList.setVisibility(View.GONE);
         }
     }
@@ -355,7 +357,7 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
         return state;
     }
 
-    private void claimWork(){
+    private void claimWork() {
         Map<String, Object> param = new HashMap<>();
         param.put("car_id", data.getId());
         JSONObject object = new JSONObject(param);
@@ -375,11 +377,11 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
 
                     @Override
                     public void onNext(BaseModel<String> stringBaseModel) {
-                        if (stringBaseModel.getCode() == 1){
+                        if (stringBaseModel.getCode() == 1) {
                             ToastUtil.toast("车辆认领成功");
                             orderStatus = ORDER_STATE.SELF_CLAIM;
                             getCarInfo(id);
-                        }else if (stringBaseModel.getCode() == 9999){
+                        } else if (stringBaseModel.getCode() == 9999) {
                             logout();
                         }
                     }
@@ -389,10 +391,10 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
     /**
      * 取消认领
      */
-    private void unClaimWork(){
-        if (data != null){
+    private void unClaimWork() {
+        if (data != null) {
             String workId = data.getWord_order_id();
-            if (!TextUtils.isEmpty(workId)){
+            if (!TextUtils.isEmpty(workId)) {
                 getApiService().cancelClaim(workId)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -409,13 +411,13 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
 
                             @Override
                             public void onNext(BaseModel<String> stringBaseModel) {
-                                if (stringBaseModel.getCode() == 1){
+                                if (stringBaseModel.getCode() == 1) {
                                     ToastUtil.toast("已取消认领");
                                     orderStatus = ORDER_STATE.UN_CLAIM;
                                     getCarInfo(id);
-                                }else if (stringBaseModel.getCode() == 9999){
+                                } else if (stringBaseModel.getCode() == 9999) {
                                     logout();
-                                }else {
+                                } else {
                                     ToastUtil.toast(stringBaseModel.getMessage());
                                 }
 
@@ -428,20 +430,27 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
     /**
      * 更改汽车状态
      */
-    private void changeCarState(final String state){
-        if (orderStatus != ORDER_STATE.CANCEL_CLAIM){
+    private void changeCarState(final String state) {
+        if (orderStatus != ORDER_STATE.CANCEL_CLAIM) {
             DialogUtil.showDialog(context, "提示", "请开始工单后再进行操作", null, null);
-        return;
+            return;
         }
-        if ("1".equals(state)) confirmStateDialog("调为可用", state);
-        else if ("2".equals(state)) confirmStateDialog("调为不可用", state);
+        String message = "";
+        if ("1".equals(state)) {
+            if (ordered) message = warnTips + "调为可用";
+            else message = "调为可用";
+            confirmStateDialog(message, state);
+        } else if ("2".equals(state)) {
+            if (ordered) message = warnTips + "调为不可用";
+            else message = "调为不可用";
+            confirmStateDialog(message, state);
+        }
     }
 
     /**
      * 查询车辆是否有订单
-     *
      */
-    private void checkOrderState(String id){
+    private void checkOrderState(final String tag) {
         getApiService().checkOrderState(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -453,21 +462,22 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
 
                     @Override
                     public void onError(Throwable e) {
-
+                        ToastUtil.toast(e.getMessage());
                     }
 
                     @Override
                     public void onNext(BaseModel<String> stringBaseModel) {
-                        if (stringBaseModel.getCode() == 1){
-                            if ("1".equals(stringBaseModel.getData())){
-
-                            }
+                        if (stringBaseModel.getCode() == 1) {
+                            ordered = "1".equals(stringBaseModel.getData());
+                            if (tag.equals("1") | tag.equals("2")) {
+                                changeCarState(tag);
+                            } else sendCommand(tag);
                         }
                     }
                 });
     }
 
-    private void confirmStateDialog(String title, final String state){
+    private void confirmStateDialog(String title, final String state) {
         new AlertDialog.Builder(context)
                 .setTitle(title)
                 .setCancelable(false)
@@ -493,21 +503,27 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
 
                                     @Override
                                     public void onNext(BaseModel<String> stringBaseModel) {
-                                        if (stringBaseModel.getCode() == 1){
+                                        if (stringBaseModel.getCode() == 1) {
                                             setCarStateBg(state.equals("1"));
                                             ToastUtil.toast(stringBaseModel.getMessage());
-                                        }else if (stringBaseModel.getCode() == 9999){
+                                            getCarInfo(id);
+                                        } else if (stringBaseModel.getCode() == 9999) {
                                             logout();
-                                        }else ToastUtil.toast(stringBaseModel.getMessage());
+                                        } else ToastUtil.toast(stringBaseModel.getMessage());
                                     }
                                 });
                     }
                 })
-                .setNegativeButton("取消", null)
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        getCarInfo(id);
+                    }
+                })
                 .show();
     }
 
-    private void confirmCommandDialog(final String title, final String command){
+    private void confirmCommandDialog(final String title, final String command) {
         new AlertDialog.Builder(context)
                 .setTitle(title)
                 .setCancelable(false)
@@ -540,45 +556,57 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                                     @Override
                                     public void onNext(BaseModel<String> stringBaseModel) {
                                         DialogUtil.showMaxProgress();
-                                        if (stringBaseModel.getCode() == 1){
+                                        if (stringBaseModel.getCode() == 1) {
+                                            getCarInfo(id);
                                             ToastUtil.toast(stringBaseModel.getMessage());
-                                        }else if (stringBaseModel.getCode() == 9999){
+                                        } else if (stringBaseModel.getCode() == 9999) {
                                             logout();
-                                        }else ToastUtil.toast(stringBaseModel.getMessage());
+                                        } else ToastUtil.toast(stringBaseModel.getMessage());
                                     }
                                 });
                     }
                 })
-                .setNegativeButton("取消", null)
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        getCarInfo(id);
+                    }
+                })
                 .show();
     }
 
     /**
      * 发送指令
      */
-    private void sendCommand(String command){
-        if (orderStatus != ORDER_STATE.CANCEL_CLAIM){
+    private void sendCommand(String command) {
+        if (orderStatus != ORDER_STATE.CANCEL_CLAIM) {
             DialogUtil.showDialog(context, "提示", "请开始工单后再进行操作", null, null);
             return;
         }
-        switch (command){
+        switch (command) {
             case "3":
-                confirmCommandDialog("寻车", command);
+                if (ordered) confirmCommandDialog(warnTips + "寻车", command);
+                else confirmCommandDialog("寻车", command);
                 break;
             case "4":
-                confirmCommandDialog("开继电器", command);
+                if (ordered) confirmCommandDialog(warnTips + "开继电器", command);
+                else confirmCommandDialog("开继电器", command);
                 break;
             case "5":
-                confirmCommandDialog("关继电器", command);
+                if (ordered) confirmCommandDialog(warnTips + "关继电器", command);
+                else confirmCommandDialog("关继电器", command);
                 break;
             case "6":
-                confirmCommandDialog("开锁", command);
+                if (ordered) confirmCommandDialog(warnTips + "开锁", command);
+                else confirmCommandDialog("开锁", command);
                 break;
             case "7":
-                confirmCommandDialog("落锁", command);
+                if (ordered) confirmCommandDialog(warnTips + "落锁", command);
+                else confirmCommandDialog("落锁", command);
                 break;
             case "8":
-                confirmCommandDialog("升窗", command);
+                if (ordered) confirmCommandDialog(warnTips + "升窗", command);
+                else confirmCommandDialog("升窗", command);
                 break;
         }
 
@@ -587,7 +615,7 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
 
     private ViewModel setBg(String status, String orderState) {
         ViewModel model = new ViewModel();
-        if ("0".equals(orderState)){
+        if ("0".equals(orderState)) {
             switch (status) {
                 case "1":
                     orderStatus = ORDER_STATE.UN_CLAIM;
@@ -602,8 +630,8 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                     model.setTextColor(Color.parseColor("#999999"));
                     return model;
             }
-        }else {
-            switch (orderState){
+        } else {
+            switch (orderState) {
                 case "1":
                     orderStatus = ORDER_STATE.SELF_CLAIM;
                     model.setText("取消认领");
@@ -673,8 +701,10 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
         routeOverlay.addToMap();
         routeOverlay.zoomToSpan(-1, -1);
         MarkerOptions options = new MarkerOptions();
-        if ("2".equals(data.getUse_state())) options.icon(BitmapDescriptorFactory.fromResource(R.mipmap.main_greencar)).position(new LatLng(end.getLatitude(), end.getLongitude()));
-        else if ("1".equals(data.getUse_state())) options.icon(BitmapDescriptorFactory.fromResource(R.mipmap.main_redcar)).position(new LatLng(end.getLatitude(), end.getLongitude()));
+        if ("2".equals(data.getUse_state()))
+            options.icon(BitmapDescriptorFactory.fromResource(R.mipmap.main_greencar)).position(new LatLng(end.getLatitude(), end.getLongitude()));
+        else if ("1".equals(data.getUse_state()))
+            options.icon(BitmapDescriptorFactory.fromResource(R.mipmap.main_redcar)).position(new LatLng(end.getLatitude(), end.getLongitude()));
         map.addMarker(options);
     }
 
@@ -693,8 +723,10 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
         walkRouteOverlay.addToMap();
         walkRouteOverlay.zoomToSpan(-1, -1);
         MarkerOptions options = new MarkerOptions();
-        if ("2".equals(data.getUse_state())) options.icon(BitmapDescriptorFactory.fromResource(R.mipmap.main_greencar)).position(new LatLng(end.getLatitude(), end.getLongitude()));
-        else if ("1".equals(data.getUse_state())) options.icon(BitmapDescriptorFactory.fromResource(R.mipmap.main_redcar)).position(new LatLng(end.getLatitude(), end.getLongitude()));
+        if ("2".equals(data.getUse_state()))
+            options.icon(BitmapDescriptorFactory.fromResource(R.mipmap.main_greencar)).position(new LatLng(end.getLatitude(), end.getLongitude()));
+        else if ("1".equals(data.getUse_state()))
+            options.icon(BitmapDescriptorFactory.fromResource(R.mipmap.main_redcar)).position(new LatLng(end.getLatitude(), end.getLongitude()));
         map.addMarker(options);
     }
 
@@ -727,11 +759,11 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
                 start = new LatLonPoint(lat, lon);
                 String distance = AmapUtil.format(AmapUtil.calculateLineDistance(new MapPoint(lat, lon), new MapPoint(end.getLatitude(), end.getLongitude())) / 1000);
                 mLayoutBinding.distance.setText("距离：" + distance + "公里");
-                if (Float.valueOf(distance) > 1f){
+                if (Float.valueOf(distance) > 1f) {
                     RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(start, end);
                     RouteSearch.DriveRouteQuery driveRouteQuery = new RouteSearch.DriveRouteQuery(fromAndTo, 0, null, null, null);
                     routeSearch.calculateDriveRouteAsyn(driveRouteQuery);
-                }else {
+                } else {
                     RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(start, end);
                     RouteSearch.WalkRouteQuery walkRouteQuery = new RouteSearch.WalkRouteQuery(fromAndTo);
                     routeSearch.calculateWalkRouteAsyn(walkRouteQuery);
