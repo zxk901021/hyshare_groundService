@@ -27,7 +27,7 @@
     <application
         android:name=".application.BaseApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/logo_220"
+        android:icon="@mipmap/logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -38,9 +38,11 @@
 
         <service android:name="com.amap.api.location.APSService" />
 
-        <activity android:name=".activity.MainActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.LoginActivity"
+        <activity
+            android:name=".activity.MainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.LoginActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -48,21 +50,36 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.WorkListActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.CarListActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.ManageCarActivity" android:launchMode="singleTask"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.CarInfoActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.StartWorkListActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.SettingActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activity.CancelOrStopTaskActivity"
-            android:windowSoftInputMode="adjustResize|stateHidden"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.WorkListActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.CarListActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.ManageCarActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.CarInfoActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.StartWorkListActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.SettingActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.CancelOrStopTaskActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity android:name=".activity.FaceResultActivity" />
+        <activity android:name=".activity.LivenessActivity" />
+        <activity android:name=".activity.CarFaultFeedbackActivity"></activity>
+        <activity
+            android:name="com.foamtrace.photopicker.PhotoPickerActivity"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/PhotoPickerTheme" />
     </application>
 
 </manifest>

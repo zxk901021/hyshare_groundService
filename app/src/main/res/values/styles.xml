@@ -10,4 +10,25 @@
     <style name="TranslucentTheme" parent="AppTheme">
         <!--在Android 4.4之前的版本上运行，直接跟随系统主题-->
     </style>
+    <style name="orange_button">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">44dp</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:layout_marginBottom">20dp</item>
+        <item name="android:layout_marginLeft">20dp</item>
+        <item name="android:layout_marginRight">20dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/shape_orange_bnt</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="PhotoPickerTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowBackground">@color/background_material_dark
+        </item>
+        <!--<item name="actionMenuTextAppearance">@style/ActionMenuTextStyle</item>-->
+        <!--<item name="actionBarTheme">@style/actionBarTheme</item>-->
+        <!--<item name="actionBarPopupTheme">@style/actionBarPopupTheme</item>-->
+    </style>
 </resources>

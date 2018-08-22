@@ -101,16 +101,11 @@ public class LoginActivity extends BaseActivity<ActivityLoginBinding> {
     private boolean editCheck(){
         username = mLayoutBinding.account.getText().toString().trim();
         password = mLayoutBinding.password.getText().toString().trim();
-        if (!TextUtils.isEmpty(username)&& !TextUtils.isEmpty(password)){
-            return true;
-        }else {
-            return false;
-        }
+        return !TextUtils.isEmpty(username) && !TextUtils.isEmpty(password);
     }
 
     private boolean checkIsLogin() {
-        if (TextUtils.isEmpty(SharedUtil.getString(context, KeyConstant.TOKEN))) return false;
-        else return true;
+        return !TextUtils.isEmpty(SharedUtil.getString(context, KeyConstant.TOKEN));
     }
 
     @Override

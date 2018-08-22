@@ -153,6 +153,16 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
             case R.id.guide:
                 AmapUtil.goLocalNavApp(context, end.getLatitude(), end.getLongitude());
                 break;
+            case R.id.submit_accident:
+                if (orderStatus != ORDER_STATE.CANCEL_CLAIM) {
+                    DialogUtil.showDialog(context, "提示", "请开始工单后再进行操作", null, null);
+                    return;
+                }
+                Intent intent = new Intent(this, CarFaultFeedbackActivity.class);
+                intent.putExtra("carid", data.getId());
+                intent.putExtra("carNum", data.getNumber());
+                startActivity(intent);
+                break;
         }
     }
 
@@ -235,6 +245,7 @@ public class ManageCarActivity extends BaseActivity<ActivityManageCarBinding> im
         mLayoutBinding.raiseWindow.setOnClickListener(this);
         mLayoutBinding.searchCar.setOnClickListener(this);
         mLayoutBinding.guide.setOnClickListener(this);
+        mLayoutBinding.submitAccident.setOnClickListener(this);
     }
 
     @Override

@@ -58,4 +58,10 @@ public interface ApiService {
     @GET("v1/groundservice/GroundCars/{id}/isOrderByCarId")
     Observable<BaseModel<String>> checkOrderState(@Path("id") String id);
 
+    @POST("http://api.hyshare.cn/v1/mobile/Faces/FaceVerify")
+    Observable<BaseModel<String>> faceVerify(@Body RequestBody requestBody);
+
+    @POST("/v1/groundservice/faults")
+    Observable<BaseModel<String>> postFaults(@Body RequestBody requestBody);
+
 }

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="vertical">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp">
+
+                <ImageView
+                    android:id="@+id/back"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:src="@mipmap/back" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="故障上报"
+                    android:textColor="#333333"
+                    android:textSize="18sp" />
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#F2F2F2"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/white"
+                android:drawableRight="@mipmap/icon_lock_car"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:orientation="horizontal"
+                android:padding="4dp"
+                >
+
+                <EditText
+                    android:id="@+id/et_plate_num"
+                    android:layout_width="0dp"
+                    android:layout_height="35dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/shape_white_rect_edit"
+                    android:enabled="false"
+                    android:hint="请输入车牌号"
+                    android:maxLength="12"
+                    android:maxLines="1"
+                    android:paddingStart="20dp"
+                    android:textSize="13sp"/>
+
+                <ImageView
+                    android:id="@+id/btn_scan_plate_num"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/icon_scan"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="#F2F2F2"></View>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:background="@color/white"
+                android:gravity="left"
+                android:padding="8dp"
+                android:text="请选择车辆问题类型"
+                android:textColor="#37312E"/>
+
+            <View
+                android:layout_marginEnd="12dp"
+                android:layout_marginStart="12dp"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="#F2F2F2"/>
+
+            <com.hyshare.groundservice.view.FlexRadioGroup
+                android:id="@+id/flex_rg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp"
+                app:flexWrap="wrap">
+
+            </com.hyshare.groundservice.view.FlexRadioGroup>
+
+            <EditText
+                android:id="@+id/et_fault_des"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/shape_white_rect_edit_big"
+                android:gravity="top"
+                android:hint="故障问题补充说明"
+                android:maxLength="200"
+                android:padding="8dp"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/tv_image_num"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:background="@color/white"
+                android:gravity="left"
+                android:padding="8dp"
+                android:text=" 请提供车况照片(0/3)"
+                android:textColor="#37312E"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:choiceMode="singleChoice"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:divider="@null"
+                android:fadingEdge="none"
+                android:listSelector="@android:color/transparent"
+                android:nestedScrollingEnabled="false"
+                android:padding="12dp"
+                android:scrollbarStyle="outsideOverlay"
+                app:layoutManager="android.support.v7.widget.GridLayoutManager"
+                app:spanCount="3"
+                tools:listitem="@layout/item_add_image">
+
+            </android.support.v7.widget.RecyclerView>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#F2F2F2"
+                android:paddingBottom="5dp">
+
+                <Button
+                    android:id="@+id/btn_post"
+                    style="@style/orange_button"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginTop="40dp"
+                    android:minHeight="0dp"
+                    android:text="提交"
+                    android:textColor="@color/white"/>
+            </RelativeLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</layout>
+
